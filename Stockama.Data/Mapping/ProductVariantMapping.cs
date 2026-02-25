@@ -12,6 +12,8 @@ public class ProductVariantMapping : BaseTableMapping<ProductVariant>
 
       builder.Property(pv => pv.GTIN).HasMaxLength(15);
 
+      // Relations
+
       builder.HasOne(pv => pv.Product)
                .WithMany()
                .HasForeignKey(pv => pv.ProductId)
@@ -21,5 +23,9 @@ public class ProductVariantMapping : BaseTableMapping<ProductVariant>
                      .WithOne(pav => pav.ProductVariant)
                      .HasForeignKey(pav => pav.ProductVariantId)
                      .OnDelete(DeleteBehavior.Cascade);
+
+      // Indexes
+
+      builder.HasIndex(e => e.GTIN).IsUnique();
    }
 }
