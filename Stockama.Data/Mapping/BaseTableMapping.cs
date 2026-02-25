@@ -14,7 +14,7 @@ public abstract class BaseTableMapping<T> : IEntityTypeConfiguration<T> where T 
       builder.HasKey(e => e.Id);
       builder.Property(e => e.IsActive).IsRequired().HasDefaultValue(true);
       builder.Property(e => e.IsDeleted).IsRequired().HasDefaultValue(false);
-      builder.Property(e => e.CreatedAt).IsRequired().HasDefaultValue(DateTimeOffset.UtcNow);
+      builder.Property(e => e.CreatedAt).IsRequired().HasDefaultValueSql("NOW()");
       builder.Property(e => e.CreatedBy).IsRequired(false).HasDefaultValue(null);
       builder.Property(e => e.UpdatedBy).IsRequired(false);
       builder.Property(e => e.UpdatedAt).IsRequired(false);
