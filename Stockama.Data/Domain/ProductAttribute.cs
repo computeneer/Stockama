@@ -4,7 +4,6 @@ namespace Stockama.Data.Domain;
 
 public class ProductAttribute : BaseEntity
 {
-   public Guid ProductId { get; set; }
    public string Name { get; set; }
    public AttributeDataType DataType { get; set; }
    public bool IsVariant { get; set; }
