@@ -12,5 +12,6 @@ public class LanguageMapping : BaseTableMapping<Language>
       builder.Property(x => x.Name).IsRequired().HasMaxLength(31);
       builder.Property(x => x.Code).IsRequired().HasMaxLength(3);
 
+      builder.HasIndex(e => e.Code).IsUnique();
    }
 }
