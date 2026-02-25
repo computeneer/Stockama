@@ -16,13 +16,23 @@ public class UserMapping : BaseTableMapping<User>
       builder.Property(e => e.Email).IsRequired().HasMaxLength(127);
       builder.Property(e => e.PasswordSalt).IsRequired();
       builder.Property(e => e.PasswordHash).IsRequired();
+
+      // Relations
+
       builder.HasOne(e => e.Company)
          .WithMany()
          .HasForeignKey(e => e.CompanyId)
          .OnDelete(DeleteBehavior.Cascade);
+
       builder.HasOne(e => e.Language)
          .WithMany()
          .HasForeignKey(e => e.LanguageId)
          .OnDelete(DeleteBehavior.Restrict);
+
+      // INDEXES
+
+      builder.HasIndex(e => e.Email).IsUnique();
+      builder.HasIndex(e => e.Username).IsUnique();
+
    }
 }
