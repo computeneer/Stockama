@@ -1,0 +1,25 @@
+services:
+   posgresql:
+      container_name: Stockama.Postgresql
+      image: postgres
+      restart: always
+      ports:
+         - "${STOCKAMA_DB_PORT}:5432"
+      networks:
+         - backendnetwork
+      volumes:
+         - pgdata:/var/lib/postgresql
+      env_file:
+         - ./.env
+      environment:
+         - POSTGRES_USER=${STOCKAMA_DB_USERNAME}
+         - POSTGRES_PASSWORD=${STOCKAMA_DB_PASSWORD}
+
+networks:
+   backendnetwork:
+      driver: bridge
+   frontendnetwork:
+      driver: bridge
+
+volumes:
+   pgdata:
