@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="Stockama.API.Common/Stockama.API.Common.csproj" />
   <Project Path="Stockama.Core/Stockama.Core.csproj" />
   <Project Path="Stockama.Data/Stockama.Data.csproj" />
   <Project Path="Stockama.Helper/Stockama.Helper.csproj" />
