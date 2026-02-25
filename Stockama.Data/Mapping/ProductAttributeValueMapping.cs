@@ -12,9 +12,11 @@ public class ProductAttributeValueMapping : BaseTableMapping<ProductAttributeVal
 
       builder.Property(x => x.ValueBool).IsRequired(false);
       builder.Property(x => x.ValueDateTime).IsRequired(false);
-      builder.Property(x => x.ValueDecimal).IsRequired(false);
+      builder.Property(x => x.ValueDecimal).IsRequired(false).HasPrecision(18, 4);
       builder.Property(x => x.ValueString).HasMaxLength(63).IsRequired(false);
       builder.Property(x => x.ValueInt).IsRequired(false);
+
+      // Relations
 
       builder.HasOne(pav => pav.ProductVariant)
                .WithMany()
@@ -26,6 +28,9 @@ public class ProductAttributeValueMapping : BaseTableMapping<ProductAttributeVal
              .HasForeignKey(pav => pav.ProductAttributeId)
              .OnDelete(DeleteBehavior.Restrict);
 
-      builder.Property(pav => pav.ValueDecimal).HasPrecision(18, 4);
+      // Indexes
+
+      builder.HasIndex(e => new { e.ProductVariantId, e.ProductAttributeId }).IsUnique();
+
    }
 }
