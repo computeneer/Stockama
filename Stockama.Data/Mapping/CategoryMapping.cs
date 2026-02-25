@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Stockama.Data.Domain;
 
@@ -11,5 +12,16 @@ public class CategoryMapping : BaseTableMapping<Category>
 
       builder.Property(e => e.Name).IsRequired().HasMaxLength(63);
       builder.Property(e => e.ParentId).IsRequired(false);
+
+      // Relations
+
+      builder.HasOne(e => e.Parent)
+         .WithMany()
+         .HasForeignKey(e => e.ParentId)
+         .OnDelete(DeleteBehavior.Restrict);
+
+      // Indexes
+
+      builder.HasIndex(e => e.Name).IsUnique();
    }
 }
