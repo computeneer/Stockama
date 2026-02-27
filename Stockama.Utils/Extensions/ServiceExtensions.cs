@@ -11,10 +11,6 @@ using Stockama.Core.Security;
 using Stockama.Core.Resources;
 using Stockama.Core.Cache;
 // using Stockama.Application.Cities.Query.GetCityList;
-// using Stockama.Core.Cache;
-// using Stockama.Core.Resources;
-// using Stockama.Core.Storage;
-// using Stockama.Core.Queue;
 
 
 namespace Stockama.Utils.Extensions;
