@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../Stockama.Core/Stockama.Core.csproj" />
+    <ProjectReference Include="../Stockama.Utils/Stockama.Utils.csproj" />
   </ItemGroup>
 
 </Project>
