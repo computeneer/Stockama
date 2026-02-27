@@ -88,4 +88,57 @@ public class EnvironmentVariables
       }
       set => _jwtTokenKey = value;
    }
+
+   private static string _redisServiceEndpoint = string.Empty;
+
+   public static string RedisServiceEndpoint
+   {
+      get
+      {
+         if (string.IsNullOrEmpty(_redisServiceEndpoint))
+         {
+            _redisServiceEndpoint = Environment.GetEnvironmentVariable("BACKPAG_REDIS_SERVISE_ENDPOINT") ?? "";
+         }
+
+         return _redisServiceEndpoint;
+      }
+
+      set => _redisServiceEndpoint = value;
+   }
+
+   private static string _redisServicePort = string.Empty;
+
+   public static string RedisServicePort
+   {
+      get
+      {
+         if (string.IsNullOrEmpty(_redisServicePort))
+         {
+            _redisServicePort = Environment.GetEnvironmentVariable("BACKPAG_REDIS_SERVICE_PORT") ?? "";
+         }
+         return _redisServicePort;
+      }
+
+      set => _redisServicePort = value;
+   }
+
+   private static string _redisServicePassword = string.Empty;
+
+   public static string RedisServicePassword
+   {
+      get
+      {
+         if (string.IsNullOrEmpty(_redisServicePassword))
+         {
+            _redisServicePassword = Environment.GetEnvironmentVariable("BACKPAG_REDIS_SERVISE_PASSWORD") ?? "";
+         }
+
+         return _redisServicePassword;
+      }
+
+      set
+      {
+         _redisServicePassword = value;
+      }
+   }
 }
