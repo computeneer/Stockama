@@ -17,7 +17,7 @@ public class EnvironmentVariables
       set => _dbHost = value;
    }
 
-   public static string _dbPort = string.Empty;
+   private static string _dbPort = string.Empty;
    public static string DbPort
    {
       get
@@ -61,7 +61,7 @@ public class EnvironmentVariables
       set => _dbUser = value;
    }
 
-   public static string _dbPassword = string.Empty;
+   private static string _dbPassword = string.Empty;
    public static string DbPassword
    {
       get
@@ -75,5 +75,17 @@ public class EnvironmentVariables
       set => _dbPassword = value;
    }
 
-
+   private static string _jwtTokenKey = string.Empty;
+   public static string JwtTokenKey
+   {
+      get
+      {
+         if (string.IsNullOrEmpty(_jwtTokenKey))
+         {
+            _jwtTokenKey = Environment.GetEnvironmentVariable("STOCKAMA_JWT_TOKEN_KEY") ?? "secret";
+         }
+         return _jwtTokenKey;
+      }
+      set => _jwtTokenKey = value;
+   }
 }
