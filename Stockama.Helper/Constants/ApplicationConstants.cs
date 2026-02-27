@@ -9,6 +9,7 @@ public class ApplicationContants
 
    public const string CACHE_PREFIX = "cache";
    public const string LANGUAGE_CACHEKEY = $"{CACHE_PREFIX}_languages";
+   public const string RESOURCE_CACHEKEY = $"{CACHE_PREFIX}_resource_{{0}}";
 
    /**  SETTINGS **/
 
