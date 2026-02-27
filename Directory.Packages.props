@@ -1,14 +1,19 @@
 <Project>
    <PropertyGroup>
-      <ManagePackageVersionCentrally>true</ManagePackageVersionCentrally>
+      <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
    </PropertyGroup>
    <ItemGroup>
-   <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.3">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.3" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+      <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
+
+      <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.3" />
+      <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.3" />
+      <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.3" />
+
+      <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+
+      <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
+      
+      <PackageVersion Include="Microsoft.IdentityModel.Tokens" Version="8.16.0" />
+      <PackageVersion Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.16.0" />
    </ItemGroup>
 </Project>
