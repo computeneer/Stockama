@@ -6,12 +6,12 @@ using StackExchange.Redis;
 
 namespace Stockama.Core.Cache;
 
-public sealed class RedisCacheManager : ICacheUnit
+public sealed class RedisCacheUnit : ICacheUnit
 {
    private readonly IDatabase _redis;
    private readonly ConnectionMultiplexer _connectionMultiplexer;
 
-   public RedisCacheManager()
+   public RedisCacheUnit()
    {
       _connectionMultiplexer = ConnectionMultiplexer.Connect(new ConfigurationOptions
       {
