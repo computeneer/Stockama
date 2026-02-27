@@ -37,7 +37,7 @@ public static class PredicateBuilder
       {
 
          // FIX
-         Expression newValue;
+         Expression? newValue;
          if (subst.TryGetValue(node, out newValue))
          {
             return newValue;

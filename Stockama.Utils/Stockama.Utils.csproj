@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MediatR" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <ProjectReference Include="../Stockama.Core/Stockama.Core.csproj" />
   </ItemGroup>
+
 </Project>

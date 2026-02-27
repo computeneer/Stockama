@@ -17,7 +17,7 @@ public class EnvironmentVariables
       set => _dbHost = value;
    }
 
-   public static string _dbPort = string.Empty;
+   private static string _dbPort = string.Empty;
    public static string DbPort
    {
       get
@@ -61,7 +61,7 @@ public class EnvironmentVariables
       set => _dbUser = value;
    }
 
-   public static string _dbPassword = string.Empty;
+   private static string _dbPassword = string.Empty;
    public static string DbPassword
    {
       get
@@ -75,5 +75,70 @@ public class EnvironmentVariables
       set => _dbPassword = value;
    }
 
+   private static string _jwtTokenKey = string.Empty;
+   public static string JwtTokenKey
+   {
+      get
+      {
+         if (string.IsNullOrEmpty(_jwtTokenKey))
+         {
+            _jwtTokenKey = Environment.GetEnvironmentVariable("STOCKAMA_JWT_TOKEN_KEY") ?? "secret";
+         }
+         return _jwtTokenKey;
+      }
+      set => _jwtTokenKey = value;
+   }
 
+   private static string _redisServiceEndpoint = string.Empty;
+
+   public static string RedisServiceEndpoint
+   {
+      get
+      {
+         if (string.IsNullOrEmpty(_redisServiceEndpoint))
+         {
+            _redisServiceEndpoint = Environment.GetEnvironmentVariable("BACKPAG_REDIS_SERVISE_ENDPOINT") ?? "";
+         }
+
+         return _redisServiceEndpoint;
+      }
+
+      set => _redisServiceEndpoint = value;
+   }
+
+   private static string _redisServicePort = string.Empty;
+
+   public static string RedisServicePort
+   {
+      get
+      {
+         if (string.IsNullOrEmpty(_redisServicePort))
+         {
+            _redisServicePort = Environment.GetEnvironmentVariable("BACKPAG_REDIS_SERVICE_PORT") ?? "";
+         }
+         return _redisServicePort;
+      }
+
+      set => _redisServicePort = value;
+   }
+
+   private static string _redisServicePassword = string.Empty;
+
+   public static string RedisServicePassword
+   {
+      get
+      {
+         if (string.IsNullOrEmpty(_redisServicePassword))
+         {
+            _redisServicePassword = Environment.GetEnvironmentVariable("BACKPAG_REDIS_SERVISE_PASSWORD") ?? "";
+         }
+
+         return _redisServicePassword;
+      }
+
+      set
+      {
+         _redisServicePassword = value;
+      }
+   }
 }
