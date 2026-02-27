@@ -1,4 +1,4 @@
-namespace Stockama.Core.Resource;
+namespace Stockama.Core.Resources;
 
 public interface IResourceManager
 {

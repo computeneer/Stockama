@@ -1,7 +1,7 @@
 
 using Stockama.Core.Cache;
 
-namespace Stockama.Core.Resource;
+namespace Stockama.Core.Resources;
 
 public sealed class ResourceManager : IResourceManager
 {
