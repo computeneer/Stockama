@@ -8,6 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Stockama.Helper;
 using Stockama.Core.Security;
+using Stockama.Core.Resources;
+using Stockama.Core.Cache;
 // using Stockama.Application.Cities.Query.GetCityList;
 // using Stockama.Core.Cache;
 // using Stockama.Core.Resources;
@@ -47,6 +49,7 @@ public static class ServiceExtensions
    public static IServiceCollection AddCommonServices(this IServiceCollection services)
    {
       services.AddHttpContextAccessor();
+      services.AddOpenApi();
 
       services.AddCors(options =>
       {
@@ -83,14 +86,12 @@ public static class ServiceExtensions
       services.AddDbContext<DbContext, DataContext>();
 
       services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-      // services.AddMediatR(conf => conf.RegisterServicesFromAssembly(typeof(GetCityListQuery).Assembly));
+      //services.AddMediatR(conf => conf.RegisterServicesFromAssembly(typeof(GetCityListQuery).Assembly));
       services.AddScoped<IJwtManager, JwtManager>();
       services.AddScoped<IPasswordHasher, PasswordHasher>();
-      // services.AddScoped<IQueueManager, QueueManager>();
-      // services.AddScoped<IResourceManager, ResourceManager>();
-      // services.AddScoped<IStorageManager, MinioManager>();
-      // services.AddScoped<ICacheUnit, RedisCacheManager>();
-      // services.AddScoped<ICacheManager, CacheManager>();
+      services.AddScoped<IResourceManager, ResourceManager>();
+      services.AddScoped<ICacheUnit, RedisCacheUnit>();
+      services.AddScoped<ICacheManager, CacheManager>();
 
       return services;
    }
