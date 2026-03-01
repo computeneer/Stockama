@@ -28,8 +28,6 @@ app.AddCommonServices();
 app.UseCustomAuthenticationMiddleware();
 app.UseAuthenticationMiddleware();
 
-app.UseMiddleware<AuthenticationMiddleware>();
-
 app.MapControllers();
 
 app.Run();
