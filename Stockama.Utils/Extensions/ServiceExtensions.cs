@@ -1,17 +1,21 @@
-using Stockama.Core.Data;
+using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using Stockama.Data;
-using Stockama.Core.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
+
+using Stockama.Data;
+using Stockama.Core.Auth;
 using Stockama.Helper;
+using Stockama.Core.Data;
 using Stockama.Core.Security;
 using Stockama.Core.Resources;
 using Stockama.Core.Cache;
-// using Stockama.Application.Cities.Query.GetCityList;
 
+using LiteBus.Extensions.Microsoft.DependencyInjection;
+using LiteBus.Commands;
+using LiteBus.Queries;
+using LiteBus.Events;
 
 namespace Stockama.Utils.Extensions;
 
@@ -46,6 +50,15 @@ public static class ServiceExtensions
    {
       services.AddHttpContextAccessor();
       services.AddOpenApi();
+
+      services.AddLiteBus(liteBus =>
+         {
+            var appAssembly = typeof(Application.Auth.Commands.LoginCommand.LoginCommand).Assembly;
+
+            liteBus.AddCommandModule(module => module.RegisterFromAssembly(appAssembly));
+            liteBus.AddQueryModule(module => module.RegisterFromAssembly(appAssembly));
+            liteBus.AddEventModule(module => module.RegisterFromAssembly(appAssembly));
+         });
 
       services.AddCors(options =>
       {
@@ -82,7 +95,6 @@ public static class ServiceExtensions
       services.AddDbContext<DbContext, DataContext>();
 
       services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-      //services.AddMediatR(conf => conf.RegisterServicesFromAssembly(typeof(GetCityListQuery).Assembly));
       services.AddScoped<IJwtManager, JwtManager>();
       services.AddScoped<IPasswordHasher, PasswordHasher>();
       services.AddScoped<IResourceManager, ResourceManager>();
