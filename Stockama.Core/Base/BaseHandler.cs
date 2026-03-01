@@ -1,4 +1,4 @@
-using Stockama.Core.Resource;
+using Stockama.Core.Resources;
 
 namespace Stockama.Core.Base;
 
