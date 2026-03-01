@@ -3,7 +3,9 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="MediatR" Version="13.1.0" />
+    <PackageVersion Include="LiteBus.Commands.Extensions.Microsoft.DependencyInjection" Version="4.3.0" />
+    <PackageVersion Include="LiteBus.Events.Extensions.Microsoft.DependencyInjection" Version="4.3.0" />
+    <PackageVersion Include="LiteBus.Queries.Extensions.Microsoft.DependencyInjection" Version="4.3.0" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.3" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.3" />

@@ -7,7 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MediatR" />
+    <PackageReference Include="LiteBus.Commands.Extensions.Microsoft.DependencyInjection" />
+    <PackageReference Include="LiteBus.Events.Extensions.Microsoft.DependencyInjection" />
+    <PackageReference Include="LiteBus.Queries.Extensions.Microsoft.DependencyInjection" />
+    
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
   </ItemGroup>
 </Project>

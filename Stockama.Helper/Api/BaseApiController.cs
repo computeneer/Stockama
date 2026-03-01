@@ -1,10 +1,11 @@
 
 using Stockama.Helper.Constants;
 using Stockama.Helper.Extensions;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-
+using LiteBus.Commands.Abstractions;
+using LiteBus.Queries.Abstractions;
+using LiteBus.Events.Abstractions;
 
 namespace Stockama.Helper.Api;
 
@@ -12,16 +13,21 @@ namespace Stockama.Helper.Api;
 [Route("api/[controller]/[action]")]
 public class BaseApiController : ControllerBase
 {
-   protected readonly IMediator _mediator;
+   protected readonly ICommandMediator _commandMediator;
+   protected readonly IQueryMediator _queryMediator;
+   protected readonly IEventMediator _eventMediator;
+
    protected readonly IHttpContextAccessor _httpContextAccessor;
    protected Guid LanguageId;
    protected Guid UserId;
 
-   public BaseApiController(IHttpContextAccessor httpContextAccessor, IMediator mediator)
+   public BaseApiController(IHttpContextAccessor httpContextAccessor, ICommandMediator commandMediator, IQueryMediator queryMediator, IEventMediator eventMediator)
    {
       _httpContextAccessor = httpContextAccessor;
-      _mediator = mediator;
       LanguageId = SetLanguageId();
+      _commandMediator = commandMediator;
+      _queryMediator = queryMediator;
+      _eventMediator = eventMediator;
    }
 
    protected Guid SetLanguageId()
@@ -39,16 +45,29 @@ public class BaseApiController : ControllerBase
       return Guid.Parse(ApplicationContants.DefaultLanguageId);
    }
 
-   protected async Task<object> Forward<T>(BaseRequest<T> baseRequest)
+   protected async Task<object> ForwardCommand<T>(BaseCommandRequest<T> baseRequest)
    {
       baseRequest.LanguageId = LanguageId;
-      return await _mediator.Send(baseRequest) ?? new object();
+      return await _commandMediator.SendAsync(baseRequest) ?? new object();
    }
 
-   protected async Task<object> ForwardAuth<T>(BaseRequest<T> baseRequest)
+   protected async Task<object> ForwardAuthCommand<T>(BaseCommandRequest<T> baseRequest)
    {
       baseRequest.LanguageId = LanguageId;
       baseRequest.UserId = User.GetUserId();
-      return await _mediator.Send(baseRequest) ?? new object();
+      return await _commandMediator.SendAsync(baseRequest) ?? new object();
+   }
+
+   protected async Task<object> ForwardQuery<T>(BaseQueryRequest<T> baseRequest)
+   {
+      baseRequest.LanguageId = LanguageId;
+      return await _queryMediator.QueryAsync(baseRequest) ?? new object();
+   }
+
+   protected async Task<object> ForwardAuthQuery<T>(BaseQueryRequest<T> baseRequest)
+   {
+      baseRequest.LanguageId = LanguageId;
+      baseRequest.UserId = User.GetUserId();
+      return await _queryMediator.QueryAsync(baseRequest) ?? new object();
    }
 }
