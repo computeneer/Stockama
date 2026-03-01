@@ -8,6 +8,8 @@ public class User : BaseEntity
    public string Email { get; set; }
    public byte[] PasswordSalt { get; set; }
    public byte[] PasswordHash { get; set; }
+   public string RefreshToken { get; set; }
+   public DateTime? RefreshTokenExpireDate { get; set; }
 
    // Relations
    public Guid CompanyId { get; set; }
