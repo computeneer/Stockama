@@ -4,13 +4,13 @@ using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using Stockama.Core.Auth.Models;
+using Stockama.Core.Authorization.Models;
 using Stockama.Core.Data;
 using Stockama.Core.Exeptions;
 using Stockama.Data.Domain;
 using Stockama.Helper;
 
-namespace Stockama.Core.Auth;
+namespace Stockama.Core.Authorization;
 
 public class JwtManager : IJwtManager
 {
@@ -31,6 +31,8 @@ public class JwtManager : IJwtManager
          ValidateIssuer = true,
          ValidateLifetime = true,
          ValidateIssuerSigningKey = true,
+         ValidateAudience = false,
+         ValidateActor = false,
          IssuerSigningKey = new SymmetricSecurityKey(_jwtTokenKey),
          ClockSkew = TimeSpan.Zero
       };
@@ -78,7 +80,7 @@ public class JwtManager : IJwtManager
       user.RefreshTokenExpireDate = DateTime.UtcNow.AddDays(7);
       _userRepository.Update(user, null);
 
-      var tokenUser = new TokenUser(user.Id, user.Username, user.Email, user.CompanyId);
+      var tokenUser = new TokenUser(user.Id, user.Username, user.Email, user.CompanyId, user.IsSuperAdmin, user.IsTenantAdmin, user.MustChangePassword);
 
       var (token, validTo) = GenerateAccessToken(tokenUser);
 
@@ -108,7 +110,10 @@ public class JwtManager : IJwtManager
             new Claim(ClaimTypes.NameIdentifier, tokenUser.userId.ToString()),
             new Claim(ClaimTypes.Email, tokenUser.Email),
             new Claim(nameof(tokenUser.UserName), tokenUser.UserName),
-            new Claim(nameof(tokenUser.CompanyId), tokenUser.CompanyId.ToString())
+            new Claim(nameof(tokenUser.CompanyId), tokenUser.CompanyId.ToString()),
+            new Claim(nameof(tokenUser.IsSuperAdmin), tokenUser.IsSuperAdmin.ToString()),
+            new Claim(nameof(tokenUser.IsTenantAdmin), tokenUser.IsTenantAdmin.ToString()),
+            new Claim(nameof(tokenUser.MustChangePassword), tokenUser.MustChangePassword.ToString())
          }),
          Issuer = "computeneer",
          Expires = expires,

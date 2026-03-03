@@ -1,6 +1,6 @@
-using Stockama.Core.Auth.Models;
+using Stockama.Core.Authorization.Models;
 
-namespace Stockama.Core.Auth;
+namespace Stockama.Core.Authorization;
 
 public interface IJwtManager
 {
