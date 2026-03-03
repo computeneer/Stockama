@@ -101,6 +101,7 @@ public static class ServiceExtensions
       services.AddDbContext<DbContext, DataContext>();
 
       services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+      services.AddScoped<ITransactionManager, EfTransactionManager>();
       services.AddScoped<IJwtManager, JwtManager>();
       services.AddScoped<IPasswordHasher, PasswordHasher>();
       services.AddScoped<IResourceManager, ResourceManager>();
