@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Stockama.Data.Domain;
 using Stockama.Helper.Constants;
+using Stockama.Helper.Enums;
+using Stockama.Helper.Extensions;
 
 namespace Stockama.Data.Mapping;
 
@@ -20,6 +22,14 @@ public class LanguageMapping : BaseTableMapping<Language>
          Id = Guid.Parse(ApplicationContants.DefaultLanguageId),
          Name = "English",
          Code = "EN",
+         IsDeleted = false,
+         IsActive = true,
+         CreatedAt = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero)
+      }, new Language
+      {
+         Id = LanguageEnums.Turkish.GetGuid(),
+         Name = "Turkish",
+         Code = "TR",
          IsDeleted = false,
          IsActive = true,
          CreatedAt = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero)
