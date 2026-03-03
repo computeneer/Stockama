@@ -6,4 +6,5 @@ public class Company : BaseEntity
    public string Description { get; set; }
    public string LogoUrl { get; set; }
    public string WebsiteUrl { get; set; }
+   public string CompanyCode { get; set; }
 }
