@@ -211,4 +211,18 @@ public class EnvironmentVariables
       }
       set => _rabbitMqPassword = value;
    }
+
+   private static string _rabbitMqVHost = string.Empty;
+   public static string RabbitMqVHost
+   {
+      get
+      {
+         if (string.IsNullOrEmpty(_rabbitMqVHost))
+         {
+            _rabbitMqVHost = Environment.GetEnvironmentVariable("STOCKAMA_RABBITMQ_VHOST") ?? "/";
+         }
+         return _rabbitMqVHost;
+      }
+      set => _rabbitMqVHost = value;
+   }
 }
