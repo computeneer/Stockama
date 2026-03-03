@@ -1,7 +1,10 @@
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.JsonWebTokens;
-using Stockama.Core.Auth;
+using Stockama.Core.Authorization;
+using Stockama.Core.Exeptions;
+using Stockama.Core.Model.Response;
+using Stockama.Helper.Constants;
 
 namespace Stockama.Core.Middlewares;
 
@@ -9,26 +12,31 @@ public class AuthenticationMiddleware
 {
    private readonly RequestDelegate _next;
    private readonly JsonWebTokenHandler _tokenHandler;
-   private readonly IJwtManager _jwtManager;
 
-   public AuthenticationMiddleware(RequestDelegate next, IJwtManager jwtManager)
+   public AuthenticationMiddleware(RequestDelegate next)
    {
       _next = next;
       _tokenHandler = new JsonWebTokenHandler();
-      _jwtManager = jwtManager;
-      _jwtManager = new JwtManager();
    }
 
    // ?????????? USER TABLOSUNA BAKILMALI MI? BAKILMAMALI MI? ???????????///
    // ?????????? Her REQUESTTE DB'ye gitmek mantikli mi? Performans mi daha onemli, guvenlik mi? ?????????????
    // ?????????? Simdilik sadece tokeni ciddiye alicam. DB'ye gitmiyoruz. ?????????????
    // TODO: Ileride her request icin db sorgusu dusunulebilir... ?????????????
-   public async Task Invoke(HttpContext context)
+   public async Task InvokeAsync(HttpContext context, IJwtManager _jwtManager)
    {
+      if (context.Items.TryGetValue(MiddlewareConstants.SuperAdminBypassAuthenticationMiddlewareKey, out var bypassValue)
+         && bypassValue is bool bypass
+         && bypass)
+      {
+         await _next(context);
+         return;
+      }
+
       var isPermitted = false;
       // Guid userId;
 
-      var allowedUrls = new[] { "/api/auth/login", "/api/auth/register", "/api/test/healthcheck" };
+      var allowedUrls = new[] { "/api/auth/login", "/api/auth/register", "/api/test/healthcheck", "/api/test/login" };
 
       var pathValue = context.Request.Path.Value?.ToLower();
 
@@ -40,7 +48,7 @@ public class AuthenticationMiddleware
       {
          try
          {
-            string? authHeader = context.Request.Headers["Authorization"];
+            string authHeader = context.Request.Headers["Authorization"];
 
             if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) && authHeader != "Bearer null")
             {
@@ -48,8 +56,7 @@ public class AuthenticationMiddleware
 
                if (token == null)
                {
-                  // TODO: CUSTOM EXCEPTION
-                  throw new Exception("Token Okunamadi.");
+                  throw new AuthenticationException("Token Okunamadi.");
                }
 
                var tokenValidationResult = await _jwtManager.Validate(authHeader);
@@ -75,9 +82,8 @@ public class AuthenticationMiddleware
       }
       else
       {
-         // TODO: Return CUSTOM BASERETURN MODEL
          context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-         await context.Response.WriteAsync("Unauthorized");
+         await context.Response.WriteAsJsonAsync(new ErrorBoolResponse("401"));
       }
    }
 

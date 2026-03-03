@@ -5,6 +5,7 @@ using Stockama.Core.Model.Response;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.Options;
+using FluentValidation;
 
 namespace Stockama.Core.Middlewares;
 
@@ -41,6 +42,7 @@ public class GlobalErrorHandlerMiddleware
             AuthenticationException => HttpStatusCode.Unauthorized,
             System.Security.Authentication.AuthenticationException => HttpStatusCode.Unauthorized,
             CustomValidationException => HttpStatusCode.BadRequest,
+            ValidationException => HttpStatusCode.BadRequest,
             _ => HttpStatusCode.BadRequest
          };
 

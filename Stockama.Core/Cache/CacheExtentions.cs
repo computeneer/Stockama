@@ -2,7 +2,7 @@ namespace Stockama.Core.Cache;
 
 public static class CacheExtensions
 {
-   public static async Task<T?> FetchAsync<T>(this ICacheUnit cacheUnit, string key, Func<Task<T>> func)
+   public static async Task<T> FetchAsync<T>(this ICacheUnit cacheUnit, string key, Func<Task<T>> func)
    {
       await Task.CompletedTask;
 
@@ -22,7 +22,7 @@ public static class CacheExtensions
       return result;
    }
 
-   public static T? Get<T>(this ICacheUnit cacheUnit, string key, Func<T> func)
+   public static T Get<T>(this ICacheUnit cacheUnit, string key, Func<T> func)
    {
 
       if (cacheUnit.IsSet(key))

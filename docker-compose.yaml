@@ -14,6 +14,18 @@ services:
       environment:
          - POSTGRES_USER=${STOCKAMA_DB_USERNAME}
          - POSTGRES_PASSWORD=${STOCKAMA_DB_PASSWORD}
+   rabbitmq:
+      container_name: Stockama.RabbitMQ
+      image: rabbitmq:3-management
+      restart: always
+      ports:
+         - "${STOCKAMA_RABBITMQ_PORT:-5672}:5672"
+         - "15672:15672"
+      networks:
+         - backendnetwork
+      environment:
+         - RABBITMQ_DEFAULT_USER=${STOCKAMA_RABBITMQ_USER:-guest}
+         - RABBITMQ_DEFAULT_PASS=${STOCKAMA_RABBITMQ_PASSWORD:-guest}
 
 networks:
    backendnetwork:

@@ -50,7 +50,7 @@ public sealed class RedisCacheUnit : ICacheUnit
       return count;
    }
 
-   public T? Get<T>(string key)
+   public T Get<T>(string key)
    {
       var value = _redis.StringGet(key);
 
@@ -60,7 +60,7 @@ public sealed class RedisCacheUnit : ICacheUnit
       return JsonSerializer.Deserialize<T>(value.ToString());
    }
 
-   public async Task<T?> GetAsync<T>(string key)
+   public async Task<T> GetAsync<T>(string key)
    {
       var value = await _redis.StringGetAsync(key);
 
