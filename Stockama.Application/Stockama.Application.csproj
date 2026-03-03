@@ -14,5 +14,6 @@
 
   <ItemGroup>
     <PackageReference Include="LiteBus.Commands.Extensions.Microsoft.DependencyInjection" />
+    <PackageReference Include="FluentValidation" />
   </ItemGroup>
 </Project>
