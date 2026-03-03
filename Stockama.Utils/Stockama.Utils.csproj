@@ -12,4 +12,8 @@
     <ProjectReference Include="../Stockama.Core/Stockama.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+  </ItemGroup>
+
 </Project>
