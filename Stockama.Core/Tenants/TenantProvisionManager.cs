@@ -19,19 +19,22 @@ public sealed class TenantProvisionManager : ITenantProvisionManager
    private readonly IUserPermissionManager _userPermissionManager;
    private readonly IPasswordHasher _passwordHasher;
    private readonly IQueueManager _queueManager;
+   private readonly ITransactionManager _transactionManager;
 
    public TenantProvisionManager(
       IRepository<Company> companyRepository,
       IRepository<User> userRepository,
       IUserPermissionManager userPermissionManager,
       IPasswordHasher passwordHasher,
-      IQueueManager queueManager)
+      IQueueManager queueManager,
+      ITransactionManager transactionManager)
    {
       _companyRepository = companyRepository;
       _userRepository = userRepository;
       _userPermissionManager = userPermissionManager;
       _passwordHasher = passwordHasher;
       _queueManager = queueManager;
+      _transactionManager = transactionManager;
    }
 
    public async Task<TenantProvisionResult> ProvisionTenantAsync(TenantProvisionRequest request, CancellationToken cancellationToken = default)
@@ -90,46 +93,49 @@ public sealed class TenantProvisionManager : ITenantProvisionManager
          LanguageId = defaultLanguageId
       };
 
-      var companyCreated = await _companyRepository.CreateBulkAsync([company], request.SuperAdminUserId);
-      if (!companyCreated)
+      return await _transactionManager.ExecuteAsync(async token =>
       {
-         throw new Exception("Company could not be created.");
-      }
-
-      tenantAdminUser.CompanyId = company.Id;
-
-      var userCreated = await _userRepository.CreateBulkAsync([tenantAdminUser], request.SuperAdminUserId);
-      if (!userCreated)
-      {
-         throw new Exception("Tenant admin user could not be created.");
-      }
-
-      await _userPermissionManager.AssignPermissionsAsync(
-         tenantAdminUser.Id,
-         PermissionConstants.TenantAdminPermissions,
-         request.SuperAdminUserId);
-
-      await _queueManager.EnqueueTemplateMessageAsync(new QueueTemplateMessageRequest
-      {
-         QueueName = QueueConstants.OneTimePasswordNotificationQueueName,
-         TemplateKey = MessageTemplateConstants.TenantAdminOneTimePasswordTemplateKey,
-         Recipient = tenantAdminUser.Email,
-         LanguageId = tenantAdminUser.LanguageId,
-         TemplateValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+         var companyCreated = await _companyRepository.CreateBulkAsync([company], request.SuperAdminUserId);
+         if (!companyCreated)
          {
-            ["FirstName"] = tenantAdminUser.FirstName,
-            ["LastName"] = tenantAdminUser.LastName,
-            ["CompanyName"] = company.Name,
-            ["Username"] = tenantAdminUser.Username,
-            ["OneTimePassword"] = oneTimePassword
+            throw new Exception("Company could not be created.");
          }
-      }, cancellationToken);
 
-      return new TenantProvisionResult(
-         company.Id,
-         tenantAdminUser.Id,
-         tenantAdminUser.Username,
-         tenantAdminUser.Email);
+         tenantAdminUser.CompanyId = company.Id;
+
+         var userCreated = await _userRepository.CreateBulkAsync([tenantAdminUser], request.SuperAdminUserId);
+         if (!userCreated)
+         {
+            throw new Exception("Tenant admin user could not be created.");
+         }
+
+         await _userPermissionManager.AssignPermissionsAsync(
+            tenantAdminUser.Id,
+            PermissionConstants.TenantAdminPermissions,
+            request.SuperAdminUserId);
+
+         await _queueManager.EnqueueTemplateMessageAsync(new QueueTemplateMessageRequest
+         {
+            QueueName = QueueConstants.OneTimePasswordNotificationQueueName,
+            TemplateKey = MessageTemplateConstants.TenantAdminOneTimePasswordTemplateKey,
+            Recipient = tenantAdminUser.Email,
+            LanguageId = tenantAdminUser.LanguageId,
+            TemplateValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+               ["FirstName"] = tenantAdminUser.FirstName,
+               ["LastName"] = tenantAdminUser.LastName,
+               ["CompanyName"] = company.Name,
+               ["Username"] = tenantAdminUser.Username,
+               ["OneTimePassword"] = oneTimePassword
+            }
+         }, token);
+
+         return new TenantProvisionResult(
+            company.Id,
+            tenantAdminUser.Id,
+            tenantAdminUser.Username,
+            tenantAdminUser.Email);
+      }, cancellationToken);
    }
 
    private async Task<string> GenerateUniqueTenantAdminUsernameAsync(string companyCode)
