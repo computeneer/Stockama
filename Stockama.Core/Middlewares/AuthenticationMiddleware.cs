@@ -1,9 +1,10 @@
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.JsonWebTokens;
-using Stockama.Core.Auth;
+using Stockama.Core.Authorization;
 using Stockama.Core.Exeptions;
 using Stockama.Core.Model.Response;
+using Stockama.Helper.Constants;
 
 namespace Stockama.Core.Middlewares;
 
@@ -24,6 +25,14 @@ public class AuthenticationMiddleware
    // TODO: Ileride her request icin db sorgusu dusunulebilir... ?????????????
    public async Task InvokeAsync(HttpContext context, IJwtManager _jwtManager)
    {
+      if (context.Items.TryGetValue(MiddlewareConstants.SuperAdminBypassAuthenticationMiddlewareKey, out var bypassValue)
+         && bypassValue is bool bypass
+         && bypass)
+      {
+         await _next(context);
+         return;
+      }
+
       var isPermitted = false;
       // Guid userId;
 
