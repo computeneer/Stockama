@@ -33,14 +33,8 @@ public sealed class MessageTemplateManager : IMessageTemplateManager
       var template = await _messageTemplateRepository.GetActiveAsync(q =>
          q.TemplateKey == normalizedTemplateKey && q.LanguageId == requestedLanguageId);
 
-      if (template == null && requestedLanguageId != fallbackLanguageId)
-      {
-         template = await _messageTemplateRepository.GetActiveAsync(q =>
-            q.TemplateKey == normalizedTemplateKey && q.LanguageId == fallbackLanguageId);
-      }
-
       var (subjectTemplate, bodyTemplate) = template == null
-         ? GetDefaultTemplate(normalizedTemplateKey)
+         ? await GetDefaultTemplateAsync(normalizedTemplateKey, requestedLanguageId, fallbackLanguageId)
          : (template.Subject, template.Body);
 
       var renderedSubject = FillTemplate(subjectTemplate, templateValues);
@@ -49,13 +43,27 @@ public sealed class MessageTemplateManager : IMessageTemplateManager
       return new RenderedTemplateMessage(renderedSubject, renderedBody);
    }
 
-   private static (string Subject, string Body) GetDefaultTemplate(string templateKey)
+   private async Task<(string Subject, string Body)> GetDefaultTemplateAsync(string templateKey, Guid requestedLanguageId, Guid fallbackLanguageId)
    {
-      if (templateKey == MessageTemplateConstants.TenantAdminOneTimePasswordTemplateKey)
+      if (requestedLanguageId != fallbackLanguageId)
       {
-         return (
-            MessageTemplateConstants.TenantAdminOneTimePasswordDefaultSubject,
-            MessageTemplateConstants.TenantAdminOneTimePasswordDefaultBody);
+         var fallbackLanguageTemplate = await _messageTemplateRepository.GetActiveAsync(q =>
+            q.TemplateKey == templateKey && q.LanguageId == fallbackLanguageId);
+
+         if (fallbackLanguageTemplate != null)
+         {
+            return (fallbackLanguageTemplate.Subject, fallbackLanguageTemplate.Body);
+         }
+      }
+
+      var fallbackTemplate = (await _messageTemplateRepository.FilterActiveAsync(
+         q => q.TemplateKey == templateKey,
+         q => q.CreatedAt,
+         isDescending: true)).FirstOrDefault();
+
+      if (fallbackTemplate != null)
+      {
+         return (fallbackTemplate.Subject, fallbackTemplate.Body);
       }
 
       throw new HttpNotFoundExeption($"Message template not found: {templateKey}");
