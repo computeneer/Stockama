@@ -1,3 +1,4 @@
+using Stockama.Core.Authorization;
 using Stockama.Core.Model.Response;
 using Stockama.Helper.Constants;
 
@@ -12,7 +13,7 @@ public class SuperAdminOnlyMiddleware
       _next = next;
    }
 
-   public async Task InvokeAsync(HttpContext context)
+   public async Task InvokeAsync(HttpContext context, IJwtManager jwtManager)
    {
       var path = context.Request.Path.Value?.ToLowerInvariant() ?? string.Empty;
       if (path.StartsWith("/openapi"))
@@ -25,6 +26,23 @@ public class SuperAdminOnlyMiddleware
       {
          context.Response.StatusCode = StatusCodes.Status401Unauthorized;
          await context.Response.WriteAsJsonAsync(new ErrorBoolResponse("401", "Unauthorized"));
+         return;
+      }
+
+      var authHeader = context.Request.Headers["Authorization"];
+
+      if (string.IsNullOrEmpty(authHeader.ToString()))
+      {
+         context.Response.StatusCode = StatusCodes.Status403Forbidden;
+         await context.Response.WriteAsJsonAsync(new ErrorBoolResponse("403", "Token not found."));
+         return;
+      }
+
+      var tokenValidationResult = await jwtManager.Validate(authHeader);
+      if (!tokenValidationResult)
+      {
+         context.Response.StatusCode = StatusCodes.Status403Forbidden;
+         await context.Response.WriteAsJsonAsync(new ErrorBoolResponse("403", "Invalid token."));
          return;
       }
 
