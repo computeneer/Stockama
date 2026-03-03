@@ -50,9 +50,24 @@ public class MessageTemplateManagerTests
    [Fact]
    public async Task RenderAsync_ShouldUseDefaultTemplate_WhenDatabaseTemplateDoesNotExist()
    {
+      var fallbackTemplate = new MessageTemplate
+      {
+         TemplateKey = MessageTemplateConstants.TenantAdminOneTimePasswordTemplateKey,
+         LanguageId = Guid.Parse(ApplicationContants.DefaultLanguageId),
+         Subject = "Stockama Hesap Bilgileriniz",
+         Body = "Merhaba {{FirstName}} {{LastName}}, {{CompanyName}} tenant'i icin kullanici adiniz {{Username}} ve tek kullanimlik sifreniz {{OneTimePassword}}."
+      };
+
       _templateRepositoryMock
          .Setup(q => q.GetActiveAsync(It.IsAny<Expression<Func<MessageTemplate, bool>>>()))
          .ReturnsAsync((MessageTemplate)null);
+
+      _templateRepositoryMock
+         .Setup(q => q.FilterActiveAsync(
+            It.IsAny<Expression<Func<MessageTemplate, bool>>>(),
+            It.IsAny<Expression<Func<MessageTemplate, object>>>(),
+            It.IsAny<bool>()))
+         .ReturnsAsync([fallbackTemplate]);
 
       var sut = new MessageTemplateManager(_templateRepositoryMock.Object);
 
@@ -78,6 +93,13 @@ public class MessageTemplateManagerTests
       _templateRepositoryMock
          .Setup(q => q.GetActiveAsync(It.IsAny<Expression<Func<MessageTemplate, bool>>>()))
          .ReturnsAsync((MessageTemplate)null);
+
+      _templateRepositoryMock
+         .Setup(q => q.FilterActiveAsync(
+            It.IsAny<Expression<Func<MessageTemplate, bool>>>(),
+            It.IsAny<Expression<Func<MessageTemplate, object>>>(),
+            It.IsAny<bool>()))
+         .ReturnsAsync([]);
 
       var sut = new MessageTemplateManager(_templateRepositoryMock.Object);
 

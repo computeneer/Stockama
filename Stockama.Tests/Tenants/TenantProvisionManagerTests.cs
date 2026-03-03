@@ -20,6 +20,7 @@ public class TenantProvisionManagerTests
    private readonly Mock<IUserPermissionManager> _userPermissionManagerMock;
    private readonly Mock<IPasswordHasher> _passwordHasherMock;
    private readonly Mock<IQueueManager> _queueManagerMock;
+   private readonly Mock<ITransactionManager> _transactionManagerMock;
 
    private readonly TenantProvisionManager _sut;
 
@@ -30,13 +31,19 @@ public class TenantProvisionManagerTests
       _userPermissionManagerMock = new Mock<IUserPermissionManager>();
       _passwordHasherMock = new Mock<IPasswordHasher>();
       _queueManagerMock = new Mock<IQueueManager>();
+      _transactionManagerMock = new Mock<ITransactionManager>();
+
+      _transactionManagerMock
+         .Setup(q => q.ExecuteAsync(It.IsAny<Func<CancellationToken, Task<TenantProvisionResult>>>(), It.IsAny<CancellationToken>()))
+         .Returns<Func<CancellationToken, Task<TenantProvisionResult>>, CancellationToken>((action, token) => action(token));
 
       _sut = new TenantProvisionManager(
          _companyRepositoryMock.Object,
          _userRepositoryMock.Object,
          _userPermissionManagerMock.Object,
          _passwordHasherMock.Object,
-         _queueManagerMock.Object);
+         _queueManagerMock.Object,
+         _transactionManagerMock.Object);
    }
 
    [Fact]
@@ -127,6 +134,10 @@ public class TenantProvisionManagerTests
 
       _userPermissionManagerMock.Verify(q =>
          q.AssignPermissionsAsync(createdTenantAdmin.Id, PermissionConstants.TenantAdminPermissions, request.SuperAdminUserId),
+         Times.Once);
+
+      _transactionManagerMock.Verify(q =>
+         q.ExecuteAsync(It.IsAny<Func<CancellationToken, Task<TenantProvisionResult>>>(), It.IsAny<CancellationToken>()),
          Times.Once);
    }
 
