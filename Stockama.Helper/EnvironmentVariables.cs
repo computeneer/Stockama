@@ -141,4 +141,74 @@ public class EnvironmentVariables
          _redisServicePassword = value;
       }
    }
+
+   private static string _queueProvider = string.Empty;
+   public static string QueueProvider
+   {
+      get
+      {
+         if (string.IsNullOrEmpty(_queueProvider))
+         {
+            _queueProvider = Environment.GetEnvironmentVariable("STOCKAMA_QUEUE_PROVIDER") ?? "development";
+         }
+         return _queueProvider;
+      }
+      set => _queueProvider = value;
+   }
+
+   private static string _rabbitMqHost = string.Empty;
+   public static string RabbitMqHost
+   {
+      get
+      {
+         if (string.IsNullOrEmpty(_rabbitMqHost))
+         {
+            _rabbitMqHost = Environment.GetEnvironmentVariable("STOCKAMA_RABBITMQ_HOST") ?? "localhost";
+         }
+         return _rabbitMqHost;
+      }
+      set => _rabbitMqHost = value;
+   }
+
+   private static string _rabbitMqPort = string.Empty;
+   public static string RabbitMqPort
+   {
+      get
+      {
+         if (string.IsNullOrEmpty(_rabbitMqPort))
+         {
+            _rabbitMqPort = Environment.GetEnvironmentVariable("STOCKAMA_RABBITMQ_PORT") ?? "5672";
+         }
+         return _rabbitMqPort;
+      }
+      set => _rabbitMqPort = value;
+   }
+
+   private static string _rabbitMqUser = string.Empty;
+   public static string RabbitMqUser
+   {
+      get
+      {
+         if (string.IsNullOrEmpty(_rabbitMqUser))
+         {
+            _rabbitMqUser = Environment.GetEnvironmentVariable("STOCKAMA_RABBITMQ_USER") ?? "guest";
+         }
+         return _rabbitMqUser;
+      }
+      set => _rabbitMqUser = value;
+   }
+
+   private static string _rabbitMqPassword = string.Empty;
+   public static string RabbitMqPassword
+   {
+      get
+      {
+         if (string.IsNullOrEmpty(_rabbitMqPassword))
+         {
+            _rabbitMqPassword = Environment.GetEnvironmentVariable("STOCKAMA_RABBITMQ_PASSWORD") ?? "guest";
+         }
+         return _rabbitMqPassword;
+      }
+      set => _rabbitMqPassword = value;
+   }
 }
