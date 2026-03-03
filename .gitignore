@@ -57,3 +57,5 @@ nunit-*.xml
 
 .env
 .env.*
+tasks.md
+.vscode
