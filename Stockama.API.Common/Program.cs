@@ -1,4 +1,3 @@
-using Stockama.Core.Middlewares;
 using Stockama.Utils.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
