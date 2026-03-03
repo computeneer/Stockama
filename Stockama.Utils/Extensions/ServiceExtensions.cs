@@ -5,17 +5,21 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
 using Stockama.Data;
-using Stockama.Core.Auth;
+using Stockama.Core.Authorization;
 using Stockama.Helper;
 using Stockama.Core.Data;
 using Stockama.Core.Security;
 using Stockama.Core.Resources;
 using Stockama.Core.Cache;
+using Stockama.Core.Tenants;
+using Stockama.Core.Queue;
 
 using LiteBus.Extensions.Microsoft.DependencyInjection;
 using LiteBus.Commands;
 using LiteBus.Queries;
 using LiteBus.Events;
+using FluentValidation;
+using Stockama.Application.Authorization.Commands.LoginCommand;
 
 namespace Stockama.Utils.Extensions;
 
@@ -53,12 +57,14 @@ public static class ServiceExtensions
 
       services.AddLiteBus(liteBus =>
          {
-            var appAssembly = typeof(Application.Auth.Commands.LoginCommand.LoginCommand).Assembly;
+            var appAssembly = typeof(LoginCommand).Assembly;
 
             liteBus.AddCommandModule(module => module.RegisterFromAssembly(appAssembly));
             liteBus.AddQueryModule(module => module.RegisterFromAssembly(appAssembly));
             liteBus.AddEventModule(module => module.RegisterFromAssembly(appAssembly));
          });
+
+      services.AddValidatorsFromAssembly(typeof(LoginCommand).Assembly);
 
       services.AddCors(options =>
       {
@@ -100,6 +106,22 @@ public static class ServiceExtensions
       services.AddScoped<IResourceManager, ResourceManager>();
       services.AddScoped<ICacheUnit, RedisCacheUnit>();
       services.AddScoped<ICacheManager, CacheManager>();
+      services.AddScoped<IUserPermissionManager, UserPermissionManager>();
+      services.AddScoped<ITenantProvisionManager, TenantProvisionManager>();
+      services.AddScoped<IMessageTemplateManager, MessageTemplateManager>();
+      services.AddScoped<IQueueManager, QueueManager>();
+
+      services.AddSingleton<IBackgroundTaskManager, BackgroundTaskManager>();
+      services.AddHostedService<QueueBackgroundService>();
+
+      if (EnvironmentVariables.QueueProvider.Equals("rabbitmq", StringComparison.OrdinalIgnoreCase))
+      {
+         services.AddSingleton<IQueueTransportManager, RabbitMqQueueTransportManager>();
+      }
+      else
+      {
+         services.AddSingleton<IQueueTransportManager, DevelopmentQueueTransportManager>();
+      }
 
       return services;
    }
