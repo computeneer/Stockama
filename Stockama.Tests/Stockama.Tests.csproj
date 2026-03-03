@@ -23,11 +23,8 @@
 
   <ItemGroup>
     <ProjectReference Include="../Stockama.Helper/Stockama.Helper.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="../Stockama.Core/Security/IPasswordHasher.cs" Link="Security/IPasswordHasher.cs" />
-    <Compile Include="../Stockama.Core/Security/PasswordHasher.cs" Link="Security/PasswordHasher.cs" />
+    <ProjectReference Include="../Stockama.Core/Stockama.Core.csproj" />
+    <ProjectReference Include="../Stockama.Application/Stockama.Application.csproj" />
   </ItemGroup>
 
 </Project>
