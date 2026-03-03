@@ -365,17 +365,17 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
       return (list, totalCount); ;
    }
 
-   public T Get(Expression<Func<T, bool>> predicate) => _entities.FirstOrDefault(predicate);
+   public T? Get(Expression<Func<T, bool>> predicate) => _entities.FirstOrDefault(predicate);
 
-   public Task<T> GetAsync(Expression<Func<T, bool>> predicate) => _entities.FirstOrDefaultAsync(predicate);
+   public Task<T?> GetAsync(Expression<Func<T, bool>> predicate) => _entities.FirstOrDefaultAsync(predicate);
 
-   public T GetActive(Expression<Func<T, bool>> predicate) => _entities.FirstOrDefault(predicate.And(f => f.IsActive && !f.IsDeleted));
+   public T? GetActive(Expression<Func<T, bool>> predicate) => _entities.FirstOrDefault(predicate.And(f => f.IsActive && !f.IsDeleted));
 
-   public Task<T> GetActiveAsync(Expression<Func<T, bool>> predicate) => _entities.FirstOrDefaultAsync(predicate.And(f => f.IsActive && !f.IsDeleted));
+   public Task<T?> GetActiveAsync(Expression<Func<T, bool>> predicate) => _entities.FirstOrDefaultAsync(predicate.And(f => f.IsActive && !f.IsDeleted));
 
-   public T GetById(Guid id) => _entities.Find(id);
+   public T? GetById(Guid id) => _entities.Find(id);
 
-   public T GetById(Guid id, Expression<Func<T, object>>[] include)
+   public T? GetById(Guid id, Expression<Func<T, object>>[] include)
    {
       IQueryable<T> query = _entities;
 
@@ -387,9 +387,9 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
       return query.FirstOrDefault(f => f.Id == id);
    }
 
-   public T GetByIdActive(Guid id) => _entities.FirstOrDefault(f => f.Id == id && f.IsActive && !f.IsDeleted);
+   public T? GetByIdActive(Guid id) => _entities.FirstOrDefault(f => f.Id == id && f.IsActive && !f.IsDeleted);
 
-   public T GetByIdActive(Guid id, Expression<Func<T, object>>[] include)
+   public T? GetByIdActive(Guid id, Expression<Func<T, object>>[] include)
    {
       IQueryable<T> query = _entities;
 
@@ -401,9 +401,9 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
       return query.FirstOrDefault(f => f.Id == id && f.IsActive && !f.IsDeleted);
    }
 
-   public Task<T> GetByIdActiveAsync(Guid id) => _entities.FirstOrDefaultAsync(f => f.Id == id && f.IsActive && !f.IsDeleted);
+   public Task<T?> GetByIdActiveAsync(Guid id) => _entities.FirstOrDefaultAsync(f => f.Id == id && f.IsActive && !f.IsDeleted);
 
-   public Task<T> GetByIdActiveAsync(Guid id, Expression<Func<T, object>>[] include)
+   public Task<T?> GetByIdActiveAsync(Guid id, Expression<Func<T, object>>[] include)
    {
       IQueryable<T> query = _entities;
 
@@ -415,9 +415,9 @@ public class Repository<T> : IRepository<T> where T : class, IEntity
       return query.FirstOrDefaultAsync(f => f.Id == id && f.IsActive && !f.IsDeleted);
    }
 
-   public Task<T> GetByIdAsync(Guid id) => _entities.FindAsync(id).AsTask();
+   public Task<T?> GetByIdAsync(Guid id) => _entities.FindAsync(id).AsTask();
 
-   public Task<T> GetByIdAsync(Guid id, Expression<Func<T, object>>[] include)
+   public Task<T?> GetByIdAsync(Guid id, Expression<Func<T, object>>[] include)
    {
       IQueryable<T> query = _entities;
 

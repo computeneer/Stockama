@@ -34,7 +34,7 @@ public class ResetUserOneTimePasswordCommandHandlerTests
       var requesterId = Guid.NewGuid();
       var companyId = Guid.NewGuid();
       var targetUserId = Guid.NewGuid();
-      QueueTemplateMessageRequest queueRequest = null;
+      QueueTemplateMessageRequest? queueRequest = null;
 
       _userRepositoryMock
          .SetupSequence(q => q.GetActiveAsync(It.IsAny<Expression<Func<User, bool>>>()))
@@ -42,6 +42,8 @@ public class ResetUserOneTimePasswordCommandHandlerTests
          {
             Id = requesterId,
             IsSuperAdmin = true,
+            FirstName = "Super",
+            LastName = "Admin",
             Username = "sa",
             Email = "sa@x.com",
             PasswordHash = [],
@@ -91,6 +93,7 @@ public class ResetUserOneTimePasswordCommandHandlerTests
       });
 
       Assert.True(result.IsSuccess);
+      Assert.NotNull(queueRequest);
       Assert.Equal(QueueConstants.OneTimePasswordNotificationQueueName, queueRequest.QueueName);
       Assert.Equal(MessageTemplateConstants.TenantAdminOneTimePasswordTemplateKey, queueRequest.TemplateKey);
       Assert.Equal("tenant@x.com", queueRequest.Recipient);

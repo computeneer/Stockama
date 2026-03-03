@@ -44,7 +44,7 @@ public sealed class ResourceManager : IResourceManager
       if (dictionary == null)
          return key;
 
-      dictionary.TryGetValue(key, out string value);
+      dictionary.TryGetValue(key, out string? value);
       return string.IsNullOrEmpty(value) ? key : value;
    }
 

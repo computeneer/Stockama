@@ -3,8 +3,8 @@ namespace Stockama.Data.Domain;
 
 public class Resource : BaseEntity
 {
-   public string Key { get; set; }
-   public string Value { get; set; }
+   public required string Key { get; set; }
+   public required string Value { get; set; }
    public Guid LanguageId { get; set; }
-   public Language Language { get; set; }
+   public Language Language { get; set; } = null!;
 }

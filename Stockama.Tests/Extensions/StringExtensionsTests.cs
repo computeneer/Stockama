@@ -7,7 +7,7 @@ public class StringExtensionsTests
    [Fact]
    public void GetImageUrl_ShouldReturnNull_WhenImageNameIsNull()
    {
-      string imageName = null;
+      string? imageName = null;
 
       var result = imageName.GetImageUrl("https://bucket/");
 

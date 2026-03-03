@@ -29,7 +29,7 @@ public class JwtManagerTests
       var tokenUser = CreateTokenUser();
       _repositoryMock
          .Setup(r => r.Get(It.IsAny<Expression<Func<User, bool>>>()))
-         .Returns((User)null);
+         .Returns((User)null!);
 
       var sut = CreateSut();
 
@@ -72,7 +72,7 @@ public class JwtManagerTests
    [Fact]
    public async Task RefreshToken_ShouldThrowException_WhenHttpContextIsMissing()
    {
-      _httpContextAccessorMock.SetupGet(x => x.HttpContext).Returns((HttpContext)null);
+      _httpContextAccessorMock.SetupGet(x => x.HttpContext).Returns((HttpContext)null!);
       var sut = CreateSut();
 
       var ex = await Assert.ThrowsAsync<Exception>(() => sut.RefreshToken("any-token"));

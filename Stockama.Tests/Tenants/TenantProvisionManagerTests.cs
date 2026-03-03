@@ -53,7 +53,15 @@ public class TenantProvisionManagerTests
 
       _userRepositoryMock
          .Setup(q => q.GetActiveAsync(It.IsAny<Expression<Func<User, bool>>>()))
-         .ReturnsAsync(new User { Id = request.SuperAdminUserId, IsSuperAdmin = false });
+         .ReturnsAsync(new User
+         {
+            Id = request.SuperAdminUserId,
+            IsSuperAdmin = false,
+            FirstName = "No",
+            LastName = "Admin",
+            Username = "user",
+            Email = "user@stockama.local"
+         });
 
       await Assert.ThrowsAsync<HttpUnauthorizedException>(() => _sut.ProvisionTenantAsync(request));
    }
@@ -62,8 +70,8 @@ public class TenantProvisionManagerTests
    public async Task ProvisionTenantAsync_ShouldCreateTenantAndQueueOneTimePassword_WhenRequestValid()
    {
       var request = CreateRequest();
-      User createdTenantAdmin = null;
-      QueueTemplateMessageRequest queueRequest = null;
+      User? createdTenantAdmin = null;
+      QueueTemplateMessageRequest? queueRequest = null;
 
       _userRepositoryMock
          .Setup(q => q.GetActiveAsync(It.IsAny<Expression<Func<User, bool>>>()))
@@ -71,6 +79,8 @@ public class TenantProvisionManagerTests
          {
             Id = request.SuperAdminUserId,
             IsSuperAdmin = true,
+            FirstName = "Super",
+            LastName = "Admin",
             Username = "superadmin",
             Email = "superadmin@stockama.local",
             PasswordHash = [],
@@ -122,6 +132,8 @@ public class TenantProvisionManagerTests
 
       Assert.NotEqual(Guid.Empty, result.CompanyId);
       Assert.NotEqual(Guid.Empty, result.TenantAdminUserId);
+      Assert.NotNull(createdTenantAdmin);
+      Assert.NotNull(queueRequest);
       Assert.Equal(result.TenantAdminUserId, createdTenantAdmin.Id);
       Assert.True(createdTenantAdmin.MustChangePassword);
       Assert.True(createdTenantAdmin.IsTenantAdmin);

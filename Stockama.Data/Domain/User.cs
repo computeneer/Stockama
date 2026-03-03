@@ -2,18 +2,18 @@ namespace Stockama.Data.Domain;
 
 public class User : BaseEntity
 {
-   public string FirstName { get; set; }
-   public string LastName { get; set; }
-   public string Username { get; set; }
-   public string Email { get; set; }
-   public byte[] PasswordSalt { get; set; }
-   public byte[] PasswordHash { get; set; }
+   public required string FirstName { get; set; }
+   public required string LastName { get; set; }
+   public required string Username { get; set; }
+   public required string Email { get; set; }
+   public byte[] PasswordSalt { get; set; } = [];
+   public byte[] PasswordHash { get; set; } = [];
    public bool IsSuperAdmin { get; set; }
    public bool IsTenantAdmin { get; set; }
    public bool MustChangePassword { get; set; }
    public bool OneTimePasswordUsed { get; set; }
    public DateTimeOffset? OneTimePasswordExpiresAt { get; set; }
-   public string RefreshToken { get; set; }
+   public string? RefreshToken { get; set; }
    public DateTime? RefreshTokenExpireDate { get; set; }
 
    // Relations
@@ -21,6 +21,6 @@ public class User : BaseEntity
    public Guid LanguageId { get; set; }
 
    // Navigation Properties
-   public Company Company { get; set; }
-   public Language Language { get; set; }
+   public Company Company { get; set; } = null!;
+   public Language Language { get; set; } = null!;
 }

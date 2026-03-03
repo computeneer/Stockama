@@ -46,13 +46,11 @@ public class JwtManager : IJwtManager
       var accessToken = GenerateAccessToken(tokenUser);
 
       var user = _userRepository.Get(q => q.Id == tokenUser.userId);
+      var existingUser = user ?? throw new AuthenticationException("User not found");
 
-      if (user == null)
-         throw new AuthenticationException("User not found");
-
-      user?.RefreshToken = newRefreshToken;
-      user?.RefreshTokenExpireDate = DateTime.UtcNow.AddDays(7);
-      await _userRepository.UpdateBulkAsync([user], null);
+      existingUser.RefreshToken = newRefreshToken;
+      existingUser.RefreshTokenExpireDate = DateTime.UtcNow.AddDays(7);
+      await _userRepository.UpdateBulkAsync([existingUser], null);
 
       return new JwtTokens(accessToken.token, newRefreshToken, accessToken.validTo);
    }
@@ -65,22 +63,20 @@ public class JwtManager : IJwtManager
       var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.Claims.First(q => q.Type == ClaimTypes.NameIdentifier).Value);
 
       var user = _userRepository.Get(q => q.Id == userId);
+      var existingUser = user ?? throw new AuthenticationException("User not found");
 
-      if (user == null)
-         throw new AuthenticationException("User not found");
-
-      if (user.RefreshToken != refreshToken)
+      if (existingUser.RefreshToken != refreshToken)
          throw new Exception("invalid refresh token");
 
-      if (user.RefreshTokenExpireDate < DateTime.UtcNow)
+      if (existingUser.RefreshTokenExpireDate < DateTime.UtcNow)
          throw new Exception("refresh token expired");
 
       var newRefreshToken = GenerateRefreshToken();
-      user.RefreshToken = newRefreshToken;
-      user.RefreshTokenExpireDate = DateTime.UtcNow.AddDays(7);
-      _userRepository.Update(user, null);
+      existingUser.RefreshToken = newRefreshToken;
+      existingUser.RefreshTokenExpireDate = DateTime.UtcNow.AddDays(7);
+      _userRepository.Update(existingUser, null);
 
-      var tokenUser = new TokenUser(user.Id, user.Username, user.Email, user.CompanyId, user.IsSuperAdmin, user.IsTenantAdmin, user.MustChangePassword);
+      var tokenUser = new TokenUser(existingUser.Id, existingUser.Username, existingUser.Email, existingUser.CompanyId, existingUser.IsSuperAdmin, existingUser.IsTenantAdmin, existingUser.MustChangePassword);
 
       var (token, validTo) = GenerateAccessToken(tokenUser);
 
