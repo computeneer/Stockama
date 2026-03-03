@@ -19,7 +19,7 @@ public class LanguageMapping : BaseTableMapping<Language>
       {
          Id = Guid.Parse(ApplicationContants.DefaultLanguageId),
          Name = "English",
-         Code = ApplicationContants.DefaultLanguageCode,
+         Code = "EN",
          IsDeleted = false,
          IsActive = true,
          CreatedAt = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero)
