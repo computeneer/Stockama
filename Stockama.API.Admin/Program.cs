@@ -1,5 +1,6 @@
 using Stockama.Core.Middlewares;
 using Stockama.Utils.Extensions;
+using Stockama.API.Admin.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +27,8 @@ app.AddCommonServices();
 // app.UseHttpsRedirection();
 
 app.UseCustomAuthenticationMiddleware();
-app.UseAuthenticationMiddleware();
+app.UseMiddleware<SuperAdminOnlyMiddleware>();
+// app.UseAuthenticationMiddleware();
 
 app.MapControllers();
 
