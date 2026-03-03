@@ -24,7 +24,7 @@ public class QueueManagerTests
    [Fact]
    public async Task EnqueueTemplateMessageAsync_ShouldScheduleAndPublishMessage()
    {
-      Func<CancellationToken, Task> queuedWorkItem = null;
+      Func<CancellationToken, Task>? queuedWorkItem = null;
 
       _backgroundTaskManagerMock
          .Setup(q => q.QueueWorkItem(It.IsAny<Func<CancellationToken, Task>>()))
@@ -50,7 +50,7 @@ public class QueueManagerTests
       });
 
       Assert.NotNull(queuedWorkItem);
-      await queuedWorkItem(CancellationToken.None);
+      await queuedWorkItem!(CancellationToken.None);
 
       _queueTransportManagerMock.Verify(q =>
          q.PublishAsync(

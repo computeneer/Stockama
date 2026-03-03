@@ -48,7 +48,7 @@ public class AuthenticationMiddleware
       {
          try
          {
-            string authHeader = context.Request.Headers["Authorization"];
+            var authHeader = context.Request.Headers.Authorization.ToString();
 
             if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) && authHeader != "Bearer null")
             {

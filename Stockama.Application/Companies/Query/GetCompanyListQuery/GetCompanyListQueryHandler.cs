@@ -26,9 +26,9 @@ public sealed class GetCompanyListQueryHandler : BaseHandler, IQueryHandler<GetC
       {
          Id = q.Id,
          Name = q.Name,
-         Description = q.Description,
-         LogoUrl = q.LogoUrl,
-         WebsiteUrl = q.WebsiteUrl,
+         Description = q.Description ?? string.Empty,
+         LogoUrl = q.LogoUrl ?? string.Empty,
+         WebsiteUrl = q.WebsiteUrl ?? string.Empty,
          CompanyCode = q.CompanyCode
       }).ToList();
 

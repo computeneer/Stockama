@@ -36,7 +36,17 @@ public class UpdateMessageTemplateCommandHandlerTests
 
       _userRepositoryMock
          .Setup(q => q.GetActiveAsync(It.IsAny<Expression<Func<User, bool>>>() ))
-         .ReturnsAsync(new User { Id = userId, IsSuperAdmin = true, Username = "sa", Email = "sa@x.com", PasswordHash = [], PasswordSalt = [] });
+         .ReturnsAsync(new User
+         {
+            Id = userId,
+            IsSuperAdmin = true,
+            FirstName = "Super",
+            LastName = "Admin",
+            Username = "sa",
+            Email = "sa@x.com",
+            PasswordHash = [],
+            PasswordSalt = []
+         });
 
       _messageTemplateRepositoryMock
          .Setup(q => q.GetActiveAsync(It.IsAny<Expression<Func<MessageTemplate, bool>>>() ))
@@ -72,11 +82,21 @@ public class UpdateMessageTemplateCommandHandlerTests
 
       _userRepositoryMock
          .Setup(q => q.GetActiveAsync(It.IsAny<Expression<Func<User, bool>>>() ))
-         .ReturnsAsync(new User { Id = userId, IsSuperAdmin = true, Username = "sa", Email = "sa@x.com", PasswordHash = [], PasswordSalt = [] });
+         .ReturnsAsync(new User
+         {
+            Id = userId,
+            IsSuperAdmin = true,
+            FirstName = "Super",
+            LastName = "Admin",
+            Username = "sa",
+            Email = "sa@x.com",
+            PasswordHash = [],
+            PasswordSalt = []
+         });
 
       _messageTemplateRepositoryMock
          .Setup(q => q.GetActiveAsync(It.IsAny<Expression<Func<MessageTemplate, bool>>>() ))
-         .ReturnsAsync((MessageTemplate)null);
+         .ReturnsAsync((MessageTemplate)null!);
 
       var sut = new UpdateMessageTemplateCommandHandler(
          _resourceManagerMock.Object,

@@ -35,12 +35,12 @@ public interface IRepository<T> where T : class, IEntity
    bool UpdateBulk(List<T> entities, Guid userId);
    bool Update(T entity, Guid? userId);
 
-   T GetById(Guid id);
-   T GetById(Guid id, Expression<Func<T, object>>[] include);
-   T Get(Expression<Func<T, bool>> predicate);
-   T GetActive(Expression<Func<T, bool>> predicate);
-   T GetByIdActive(Guid id);
-   T GetByIdActive(Guid id, Expression<Func<T, object>>[] include);
+   T? GetById(Guid id);
+   T? GetById(Guid id, Expression<Func<T, object>>[] include);
+   T? Get(Expression<Func<T, bool>> predicate);
+   T? GetActive(Expression<Func<T, bool>> predicate);
+   T? GetByIdActive(Guid id);
+   T? GetByIdActive(Guid id, Expression<Func<T, object>>[] include);
 
    int SaveChanges();
 
@@ -75,12 +75,12 @@ public interface IRepository<T> where T : class, IEntity
    Task<bool> UpdateBulkAsync(List<T> entities, Guid? userId);
    Task<bool> UpdateAsync(T entity, Guid? userId);
 
-   Task<T> GetByIdAsync(Guid id);
-   Task<T> GetAsync(Expression<Func<T, bool>> predicate);
-   Task<T> GetActiveAsync(Expression<Func<T, bool>> predicate);
-   Task<T> GetByIdAsync(Guid id, Expression<Func<T, object>>[] include);
-   Task<T> GetByIdActiveAsync(Guid id);
-   Task<T> GetByIdActiveAsync(Guid id, Expression<Func<T, object>>[] include);
+   Task<T?> GetByIdAsync(Guid id);
+   Task<T?> GetAsync(Expression<Func<T, bool>> predicate);
+   Task<T?> GetActiveAsync(Expression<Func<T, bool>> predicate);
+   Task<T?> GetByIdAsync(Guid id, Expression<Func<T, object>>[] include);
+   Task<T?> GetByIdActiveAsync(Guid id);
+   Task<T?> GetByIdActiveAsync(Guid id, Expression<Func<T, object>>[] include);
 
    Task<int> SaveChangesAsync();
 

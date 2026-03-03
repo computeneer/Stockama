@@ -2,7 +2,7 @@ namespace Stockama.Data.Domain;
 
 public class ProductAttributeValue : BaseEntity
 {
-   public string ValueString { get; set; }
+   public string? ValueString { get; set; }
    public int? ValueInt { get; set; }
    public decimal? ValueDecimal { get; set; }
    public bool? ValueBool { get; set; }
@@ -13,6 +13,6 @@ public class ProductAttributeValue : BaseEntity
    public Guid ProductAttributeId { get; set; }
 
    // Navigation Properties
-   public ProductAttribute ProductAttribute { get; set; }
-   public ProductVariant ProductVariant { get; set; }
+   public ProductAttribute ProductAttribute { get; set; } = null!;
+   public ProductVariant ProductVariant { get; set; } = null!;
 }

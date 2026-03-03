@@ -55,9 +55,10 @@ public sealed class RedisCacheUnit : ICacheUnit
       var value = _redis.StringGet(key);
 
       if (value.IsNullOrEmpty)
-         return default;
+         return default!;
 
-      return JsonSerializer.Deserialize<T>(value.ToString());
+      var deserializedValue = JsonSerializer.Deserialize<T>(value.ToString());
+      return deserializedValue!;
    }
 
    public async Task<T> GetAsync<T>(string key)
@@ -65,9 +66,10 @@ public sealed class RedisCacheUnit : ICacheUnit
       var value = await _redis.StringGetAsync(key);
 
       if (value.IsNullOrEmpty)
-         return default;
+         return default!;
 
-      return JsonSerializer.Deserialize<T>(value.ToString());
+      var deserializedValue = JsonSerializer.Deserialize<T>(value.ToString());
+      return deserializedValue!;
    }
 
    public Dictionary<string, T> GetByPattern<T>(string pattern)
@@ -82,11 +84,17 @@ public sealed class RedisCacheUnit : ICacheUnit
 
          foreach (var key in server.Keys(pattern: $"{pattern}*"))
          {
-            var cache = Get<T>(key);
+            var cacheKey = key.ToString();
+            if (string.IsNullOrWhiteSpace(cacheKey))
+            {
+               continue;
+            }
+
+            var cache = Get<T>(cacheKey);
 
             if (cache != null)
             {
-               dictionary.Add(key, cache);
+               dictionary.Add(cacheKey, cache);
             }
          }
       }
@@ -105,11 +113,17 @@ public sealed class RedisCacheUnit : ICacheUnit
 
          foreach (var key in server.Keys(pattern: $"{pattern}*"))
          {
-            var cache = await GetAsync<T>(key);
+            var cacheKey = key.ToString();
+            if (string.IsNullOrWhiteSpace(cacheKey))
+            {
+               continue;
+            }
+
+            var cache = await GetAsync<T>(cacheKey);
 
             if (cache != null)
             {
-               dictionary.Add(key, cache);
+               dictionary.Add(cacheKey, cache);
             }
          }
       }

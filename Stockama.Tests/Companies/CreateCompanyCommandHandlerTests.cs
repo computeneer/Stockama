@@ -20,7 +20,7 @@ public class CreateCompanyCommandHandlerTests
    [Fact]
    public async Task HandleAsync_ShouldProvisionTenant_AndReturnSuccess()
    {
-      TenantProvisionRequest capturedRequest = null;
+      TenantProvisionRequest? capturedRequest = null;
 
       _tenantProvisionManagerMock
          .Setup(q => q.ProvisionTenantAsync(It.IsAny<TenantProvisionRequest>(), It.IsAny<CancellationToken>()))
@@ -43,6 +43,7 @@ public class CreateCompanyCommandHandlerTests
       });
 
       Assert.True(result.IsSuccess);
+      Assert.NotNull(capturedRequest);
       Assert.Equal("ACME", capturedRequest.CompanyName);
       Assert.Equal("acme", capturedRequest.CompanyCode);
    }

@@ -11,7 +11,7 @@ public class DataContext : DbContext
       $";Username={EnvironmentVariables.DbUser}" +
       $";Password={EnvironmentVariables.DbPassword}";
 
-   private string _connectionString;
+   private string _connectionString = string.Empty;
 
    protected string ConntectionString
    {

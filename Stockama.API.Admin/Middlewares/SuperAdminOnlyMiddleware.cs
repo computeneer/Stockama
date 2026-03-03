@@ -29,9 +29,9 @@ public class SuperAdminOnlyMiddleware
          return;
       }
 
-      var authHeader = context.Request.Headers["Authorization"];
+      var authHeader = context.Request.Headers.Authorization.ToString();
 
-      if (string.IsNullOrEmpty(authHeader.ToString()))
+      if (string.IsNullOrEmpty(authHeader))
       {
          context.Response.StatusCode = StatusCodes.Status403Forbidden;
          await context.Response.WriteAsJsonAsync(new ErrorBoolResponse("403", "Token not found."));

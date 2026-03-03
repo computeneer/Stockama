@@ -9,11 +9,11 @@ public class BaseErrorResponse<T> : IBaseResponse<T>
     public string Message { get; set; }
     public string Status { get; set; }
     public int? Total { get; set; }
-    public T Data { get; set; }
+    public T Data { get; set; } = default!;
 
     public BaseErrorResponse(HttpStatusCode status, string message = "")
     {
-        Data = default;
+        Data = default!;
         Total = null;
         IsSuccess = false;
         Status = status.ToIntString();
@@ -21,7 +21,7 @@ public class BaseErrorResponse<T> : IBaseResponse<T>
     }
     public BaseErrorResponse(string status, string message = "")
     {
-        Data = default;
+        Data = default!;
         Total = null;
         IsSuccess = false;
         Status = status;

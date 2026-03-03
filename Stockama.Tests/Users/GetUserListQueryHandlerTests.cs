@@ -31,6 +31,8 @@ public class GetUserListQueryHandlerTests
          {
             Id = requesterId,
             IsSuperAdmin = false,
+            FirstName = "Regular",
+            LastName = "User",
             Username = "u",
             Email = "u@x.com",
             PasswordHash = [],
@@ -57,6 +59,8 @@ public class GetUserListQueryHandlerTests
          {
             Id = requesterId,
             IsSuperAdmin = true,
+            FirstName = "Super",
+            LastName = "Admin",
             Username = "sa",
             Email = "sa@x.com",
             PasswordHash = [],

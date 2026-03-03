@@ -4,7 +4,7 @@ namespace Stockama.Data.Domain;
 
 public class ProductAttribute : BaseEntity
 {
-   public string Name { get; set; }
+   public required string Name { get; set; }
    public AttributeDataType DataType { get; set; }
    public bool IsVariant { get; set; }
 
@@ -12,5 +12,5 @@ public class ProductAttribute : BaseEntity
    public Guid CategoryId { get; set; }
 
    // Navigation Properties
-   public Category Category { get; set; }
+   public Category Category { get; set; } = null!;
 }

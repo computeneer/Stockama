@@ -25,11 +25,21 @@ public class CreateMessageTemplateCommandHandlerTests
    {
       var userId = Guid.NewGuid();
       var languageId = Guid.NewGuid();
-      MessageTemplate createdTemplate = null;
+      MessageTemplate? createdTemplate = null;
 
       _userRepositoryMock
          .Setup(q => q.GetActiveAsync(It.IsAny<Expression<Func<User, bool>>>() ))
-         .ReturnsAsync(new User { Id = userId, IsSuperAdmin = true, Username = "sa", Email = "sa@x.com", PasswordHash = [], PasswordSalt = [] });
+         .ReturnsAsync(new User
+         {
+            Id = userId,
+            IsSuperAdmin = true,
+            FirstName = "Super",
+            LastName = "Admin",
+            Username = "sa",
+            Email = "sa@x.com",
+            PasswordHash = [],
+            PasswordSalt = []
+         });
 
       _messageTemplateRepositoryMock
          .Setup(q => q.AnyActiveAsync(It.IsAny<Expression<Func<MessageTemplate, bool>>>() ))
@@ -55,6 +65,7 @@ public class CreateMessageTemplateCommandHandlerTests
       });
 
       Assert.True(result.IsSuccess);
+      Assert.NotNull(createdTemplate);
       Assert.Equal("tenant_admin_one_time_password", createdTemplate.TemplateKey);
       Assert.Equal(languageId, createdTemplate.LanguageId);
       Assert.Equal("Subject", createdTemplate.Subject);
@@ -68,7 +79,17 @@ public class CreateMessageTemplateCommandHandlerTests
 
       _userRepositoryMock
          .Setup(q => q.GetActiveAsync(It.IsAny<Expression<Func<User, bool>>>() ))
-         .ReturnsAsync(new User { Id = userId, IsSuperAdmin = true, Username = "sa", Email = "sa@x.com", PasswordHash = [], PasswordSalt = [] });
+         .ReturnsAsync(new User
+         {
+            Id = userId,
+            IsSuperAdmin = true,
+            FirstName = "Super",
+            LastName = "Admin",
+            Username = "sa",
+            Email = "sa@x.com",
+            PasswordHash = [],
+            PasswordSalt = []
+         });
 
       _messageTemplateRepositoryMock
          .Setup(q => q.AnyActiveAsync(It.IsAny<Expression<Func<MessageTemplate, bool>>>() ))

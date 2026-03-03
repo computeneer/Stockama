@@ -11,8 +11,8 @@ public sealed class RabbitMqQueueTransportManager : IQueueTransportManager, IDis
    private readonly object _syncRoot = new();
    private readonly ConnectionFactory _connectionFactory;
 
-   private IConnection _connection;
-   private IModel _channel;
+   private IConnection? _connection;
+   private IModel? _channel;
    private bool _disposed;
 
    public RabbitMqQueueTransportManager(ILogger<RabbitMqQueueTransportManager> logger)
@@ -32,20 +32,21 @@ public sealed class RabbitMqQueueTransportManager : IQueueTransportManager, IDis
    public Task PublishAsync(string queueName, string payload, CancellationToken cancellationToken = default)
    {
       EnsureConnected();
+      var channel = _channel!;
 
       var body = Encoding.UTF8.GetBytes(payload);
 
-      _channel.QueueDeclare(
+      channel.QueueDeclare(
          queue: queueName,
          durable: true,
          exclusive: false,
          autoDelete: false,
          arguments: null);
 
-      var properties = _channel.CreateBasicProperties();
+      var properties = channel.CreateBasicProperties();
       properties.Persistent = true;
 
-      _channel.BasicPublish(
+      channel.BasicPublish(
          exchange: string.Empty,
          routingKey: queueName,
          basicProperties: properties,

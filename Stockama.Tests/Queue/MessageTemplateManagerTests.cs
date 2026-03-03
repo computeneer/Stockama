@@ -60,7 +60,7 @@ public class MessageTemplateManagerTests
 
       _templateRepositoryMock
          .Setup(q => q.GetActiveAsync(It.IsAny<Expression<Func<MessageTemplate, bool>>>()))
-         .ReturnsAsync((MessageTemplate)null);
+         .ReturnsAsync((MessageTemplate)null!);
 
       _templateRepositoryMock
          .Setup(q => q.FilterActiveAsync(
@@ -92,7 +92,7 @@ public class MessageTemplateManagerTests
    {
       _templateRepositoryMock
          .Setup(q => q.GetActiveAsync(It.IsAny<Expression<Func<MessageTemplate, bool>>>()))
-         .ReturnsAsync((MessageTemplate)null);
+         .ReturnsAsync((MessageTemplate)null!);
 
       _templateRepositoryMock
          .Setup(q => q.FilterActiveAsync(
@@ -114,7 +114,7 @@ public class MessageTemplateManagerTests
 
       _templateRepositoryMock
          .SetupSequence(q => q.GetActiveAsync(It.IsAny<Expression<Func<MessageTemplate, bool>>>()))
-         .ReturnsAsync((MessageTemplate)null)
+         .ReturnsAsync((MessageTemplate)null!)
          .ReturnsAsync(new MessageTemplate
          {
             TemplateKey = MessageTemplateConstants.TenantAdminOneTimePasswordTemplateKey,

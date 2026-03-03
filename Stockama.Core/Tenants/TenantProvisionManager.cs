@@ -71,9 +71,9 @@ public sealed class TenantProvisionManager : ITenantProvisionManager
       var company = new Company
       {
          Name = request.CompanyName.Trim(),
-         Description = request.Description?.Trim(),
-         LogoUrl = request.LogoUrl?.Trim(),
-         WebsiteUrl = request.WebsiteUrl?.Trim(),
+         Description = request.Description?.Trim() ?? string.Empty,
+         LogoUrl = request.LogoUrl?.Trim() ?? string.Empty,
+         WebsiteUrl = request.WebsiteUrl?.Trim() ?? string.Empty,
          CompanyCode = normalizedCompanyCode
       };
 
