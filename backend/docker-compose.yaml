@@ -26,6 +26,16 @@ services:
       environment:
          - RABBITMQ_DEFAULT_USER=${STOCKAMA_RABBITMQ_USER:-guest}
          - RABBITMQ_DEFAULT_PASS=${STOCKAMA_RABBITMQ_PASSWORD:-guest}
+   redis:
+      container_name: Stockama.Redis
+      image: redis
+      restart: always
+      ports:
+         - "${STOCKAMA_REDIS_PORT:-6379}:6379"
+      networks:
+         - backendnetwork
+      env_file:
+         - ./.env
 
 networks:
    backendnetwork:
