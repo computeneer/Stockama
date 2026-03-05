@@ -1,0 +1,19 @@
+{
+  "name": "stockama-monorepo",
+  "private": true,
+  "packageManager": "bun@1.3.9",
+  "workspaces": [
+    "frontend/admin",
+    "frontend/web",
+    "frontend/packages/*"
+  ],
+  "scripts": {
+    "dev:admin": "bun run --cwd frontend/admin dev",
+    "dev:web": "bun run --cwd frontend/web dev",
+    "build:admin": "bun run --cwd frontend/admin build",
+    "build:web": "bun run --cwd frontend/web build",
+    "build:frontend": "bun run build:admin && bun run build:web",
+    "build:backend": "dotnet build ./backend/Stockama.slnx",
+    "test:backend": "dotnet test ./backend/Stockama.slnx"
+  }
+}

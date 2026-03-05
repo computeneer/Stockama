@@ -1,14 +1,16 @@
 #!/bin/bash
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT="$SCRIPT_DIR/../../Stockama.Data/Stockama.Data.csproj"
+
 if [ -z "$1" ]; then
   echo "❌ Migration name gerekli!"
-  echo "Kullanım: ./scripts/dev/migration.sh MigrationName"
+  echo "Kullanım: ./backend/scripts/dev/migration.sh MigrationName"
   exit 1
 fi
 
 NAME=$1
-PROJECT="../../Stockama.Data/"
 
 echo "🔧 Adding migration '$NAME'..."
 dotnet ef migrations add "$NAME" --project "$PROJECT"

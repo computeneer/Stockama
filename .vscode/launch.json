@@ -8,7 +8,7 @@
 			"name": "C#: Stockama.API.Common Debug",
 			"type": "dotnet",
 			"request": "launch",
-			"projectPath": "${workspaceFolder}/Stockama.API.Common/Stockama.API.Common.csproj"
+			"projectPath": "${workspaceFolder}/backend/Stockama.API.Common/Stockama.API.Common.csproj"
 		}
 	]
 }
