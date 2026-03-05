@@ -71,7 +71,15 @@ public static class ServiceExtensions
          options.AddPolicy("LocalPolicy", policy =>
          {
             policy
-               .WithOrigins("http://localhost:5173", "https://localhost:5173", "http://127.0.0.1:5173", "https://[::1]:5173")
+               .WithOrigins(
+                  "http://localhost:5173",
+                  "https://localhost:5173",
+                  "http://127.0.0.1:5173",
+                  "https://[::1]:5173",
+                  "http://localhost:5174",
+                  "https://localhost:5174",
+                  "http://127.0.0.1:5174",
+                  "https://[::1]:5174")
                .AllowAnyHeader()
                .AllowAnyMethod()
                .AllowCredentials();
