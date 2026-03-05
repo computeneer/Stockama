@@ -8,5 +8,6 @@
   <Project Path="Stockama.Data/Stockama.Data.csproj" />
   <Project Path="Stockama.Helper/Stockama.Helper.csproj" />
   <Project Path="Stockama.Utils/Stockama.Utils.csproj" />
+  <Project Path="Stockama.Seeder/Stockama.Seeder.csproj" />
   <Project Path="Stockama.Tests/Stockama.Tests.csproj" />
 </Solution>
