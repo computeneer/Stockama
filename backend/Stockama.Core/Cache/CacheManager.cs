@@ -13,13 +13,20 @@ public sealed class CacheManager : ICacheManager
    private readonly ICacheUnit _cacheUnit;
    private readonly IRepository<Language> _languageRepository;
    private readonly IRepository<Resource> _resourceRepository;
+   private readonly IRepository<Company> _companyRepository;
 
 
-   public CacheManager(ICacheUnit cacheUnit, IRepository<Language> languageRepository, IRepository<Resource> resourceRepository)
+   public CacheManager(ICacheUnit cacheUnit, IRepository<Language> languageRepository, IRepository<Resource> resourceRepository, IRepository<Company> companyRepository)
    {
       _cacheUnit = cacheUnit;
       _languageRepository = languageRepository;
       _resourceRepository = resourceRepository;
+      _companyRepository = companyRepository;
+   }
+
+   public void DeleteCompanyCache()
+   {
+      _cacheUnit.Remove(ApplicationContants.COMPANY_CACHEKEY);
    }
 
    public void DeleteLanguageCache()
@@ -35,6 +42,20 @@ public sealed class CacheManager : ICacheManager
    public void DeleteResourceCache(Guid languageId)
    {
       _cacheUnit.Remove(string.Format(ApplicationContants.RESOURCE_CACHEKEY, languageId));
+   }
+
+   public async ValueTask<List<CompanyCacheModel>> GetCompanyCacheList()
+   {
+      return await _cacheUnit.FetchAsync(ApplicationContants.COMPANY_CACHEKEY, async () =>
+      {
+         var result = await _companyRepository.AllActiveAsync();
+         return result.Select(f => new CompanyCacheModel
+         {
+            CompanyCode = f.CompanyCode,
+            Name = f.Name,
+            Id = f.Id,
+         }).ToList();
+      });
    }
 
    public async ValueTask<List<LanguageCacheModel>> GetLanguageCacheList()
