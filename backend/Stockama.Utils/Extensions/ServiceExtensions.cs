@@ -19,7 +19,7 @@ using LiteBus.Commands;
 using LiteBus.Queries;
 using LiteBus.Events;
 using FluentValidation;
-using Stockama.Application.Authorization.Commands.LoginCommand;
+using Stockama.Application.Auth.Commands.LoginCommand;
 
 namespace Stockama.Utils.Extensions;
 

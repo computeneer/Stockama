@@ -9,7 +9,7 @@ using Stockama.Core.Security;
 using Stockama.Data.Domain;
 using Stockama.Core.Authorization.Models;
 
-namespace Stockama.Application.Authorization.Commands.LoginCommand;
+namespace Stockama.Application.Auth.Commands.LoginCommand;
 
 public sealed class LoginCommandHandler : BaseHandler, ICommandHandler<LoginCommand, IBaseDataResponse<LoginResponse>>
 {

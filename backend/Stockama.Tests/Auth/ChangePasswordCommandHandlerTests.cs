@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 using Moq;
-using Stockama.Application.Authorization.Commands.ChangePasswordCommand;
+using Stockama.Application.Auth.Commands.ChangePasswordCommand;
 using Stockama.Core.Data;
 using Stockama.Core.Resources;
 using Stockama.Core.Security;

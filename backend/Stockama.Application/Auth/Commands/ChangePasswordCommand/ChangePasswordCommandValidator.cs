@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Stockama.Application.Authorization.Commands.ChangePasswordCommand;
+namespace Stockama.Application.Auth.Commands.ChangePasswordCommand;
 
 public sealed class ChangePasswordCommandValidator : AbstractValidator<ChangePasswordCommand>
 {

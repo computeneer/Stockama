@@ -1,8 +1,8 @@
-using Stockama.Application.Authorization.Models;
+using Stockama.Application.Auth.Models;
 using Stockama.Core.Model.Response;
 using Stockama.Helper.Api;
 
-namespace Stockama.Application.Authorization.Commands.LoginCommand;
+namespace Stockama.Application.Auth.Commands.LoginCommand;
 
 public sealed class LoginCommand : BaseCommandRequest<IBaseDataResponse<LoginResponse>>
 {

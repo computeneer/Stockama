@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Stockama.Application.Authorization.Commands.LoginCommand;
+namespace Stockama.Application.Auth.Commands.LoginCommand;
 
 public sealed class LoginCommandValidator : AbstractValidator<LoginCommand>
 {

@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 using Moq;
-using Stockama.Application.Authorization.Commands.LoginCommand;
+using Stockama.Application.Auth.Commands.LoginCommand;
 using Stockama.Core.Authorization;
 using Stockama.Core.Authorization.Models;
 using Stockama.Core.Data;

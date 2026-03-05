@@ -1,7 +1,7 @@
 using Stockama.Core.Model.Response;
 using Stockama.Helper.Api;
 
-namespace Stockama.Application.Authorization.Commands.ChangePasswordCommand;
+namespace Stockama.Application.Auth.Commands.ChangePasswordCommand;
 
 public sealed class ChangePasswordCommand : BaseCommandRequest<IBaseBoolResponse>
 {

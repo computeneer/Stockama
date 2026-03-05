@@ -7,7 +7,7 @@ using Stockama.Core.Security;
 using Stockama.Data.Domain;
 using Stockama.Helper.Extensions;
 
-namespace Stockama.Application.Authorization.Commands.ChangePasswordCommand;
+namespace Stockama.Application.Auth.Commands.ChangePasswordCommand;
 
 public sealed class ChangePasswordCommandHandler : BaseHandler, ICommandHandler<ChangePasswordCommand, IBaseBoolResponse>
 {
