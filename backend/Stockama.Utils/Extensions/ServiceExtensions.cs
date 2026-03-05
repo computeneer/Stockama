@@ -89,6 +89,7 @@ public static class ServiceExtensions
                opt.TokenValidationParameters = new TokenValidationParameters
                {
                   ValidateIssuer = true,
+                  ValidIssuer = "computeneer",
                   ValidateAudience = false,
                   ValidateLifetime = true,
                   IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(EnvironmentVariables.JwtTokenKey)),
