@@ -225,4 +225,58 @@ public class EnvironmentVariables
       }
       set => _rabbitMqVHost = value;
    }
+
+   private static string _authClientType = string.Empty;
+   public static string AuthClientType
+   {
+      get
+      {
+         if (string.IsNullOrEmpty(_authClientType))
+         {
+            _authClientType = Environment.GetEnvironmentVariable("STOCKAMA_AUTH_CLIENT_TYPE") ?? "web";
+         }
+         return _authClientType;
+      }
+      set => _authClientType = value;
+   }
+
+   private static string _defaultSuperAdminUsername = string.Empty;
+   public static string DefaultSuperAdminUsername
+   {
+      get
+      {
+         if (string.IsNullOrEmpty(_defaultSuperAdminUsername))
+         {
+            _defaultSuperAdminUsername = Environment.GetEnvironmentVariable("DEFAULT_SUPERADMIN_USERNAME") ?? "web";
+         }
+         return _defaultSuperAdminUsername;
+      }
+      set => _defaultSuperAdminUsername = value;
+   }
+   private static string _defaultSuperAdminPassword = string.Empty;
+   public static string DefaultSuperAdminPassword
+   {
+      get
+      {
+         if (string.IsNullOrEmpty(_defaultSuperAdminPassword))
+         {
+            _defaultSuperAdminPassword = Environment.GetEnvironmentVariable("DEFAULT_SUPERADMIN_PASSWORD") ?? "web";
+         }
+         return _defaultSuperAdminPassword;
+      }
+      set => _defaultSuperAdminPassword = value;
+   }
+   private static string _defaultSuperAdminEmail = string.Empty;
+   public static string DefaultSuperAdminEmail
+   {
+      get
+      {
+         if (string.IsNullOrEmpty(_defaultSuperAdminEmail))
+         {
+            _defaultSuperAdminEmail = Environment.GetEnvironmentVariable("DEFAULT_SUPERADMIN_EMAIL") ?? "web";
+         }
+         return _defaultSuperAdminEmail;
+      }
+      set => _defaultSuperAdminEmail = value;
+   }
 }
