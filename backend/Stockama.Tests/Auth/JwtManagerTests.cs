@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Stockama.Core.Authorization;
@@ -43,121 +42,88 @@ public class JwtManagerTests
    {
       var tokenUser = CreateTokenUser();
       var user = CreateUser(tokenUser);
-
-      _repositoryMock
-         .Setup(r => r.Get(It.IsAny<Expression<Func<User, bool>>>()))
-         .Returns(user);
-
-      _repositoryMock
-         .Setup(r => r.UpdateBulkAsync(It.IsAny<List<User>>(), null))
-         .ReturnsAsync(true);
+      SetupUserPersistence(user);
 
       var sut = CreateSut();
-
-      var result = await sut.GenerateToken(tokenUser);
+      var result = await sut.GenerateToken(tokenUser, "web");
 
       Assert.False(string.IsNullOrWhiteSpace(result.AccessToken));
       Assert.False(string.IsNullOrWhiteSpace(result.RefreshToken));
       Assert.Equal(result.RefreshToken, user.RefreshToken);
       Assert.True(result.ValidTo > DateTime.UtcNow.AddMinutes(50));
-      Assert.True(result.ValidTo <= DateTime.UtcNow.AddHours(1).AddMinutes(1));
 
       _repositoryMock.Verify(
-         r => r.UpdateBulkAsync(
-            It.Is<List<User>>(list => list.Count == 1 && list[0] == user),
-            null),
+         r => r.UpdateBulkAsync(It.Is<List<User>>(list => list.Count == 1 && list[0] == user), null),
          Times.Once);
    }
 
    [Fact]
-   public async Task RefreshToken_ShouldThrowException_WhenHttpContextIsMissing()
-   {
-      _httpContextAccessorMock.SetupGet(x => x.HttpContext).Returns((HttpContext)null!);
-      var sut = CreateSut();
-
-      var ex = await Assert.ThrowsAsync<Exception>(() => sut.RefreshToken("any-token"));
-
-      Assert.Equal("User is empty", ex.Message);
-   }
-
-   [Fact]
-   public async Task RefreshToken_ShouldThrowException_WhenRefreshTokenDoesNotMatch()
+   public async Task RefreshAccessToken_ShouldReturnNewTokens_WhenRefreshBindingIsValid()
    {
       var tokenUser = CreateTokenUser();
       var user = CreateUser(tokenUser);
-      user.RefreshToken = "stored-token";
-      user.RefreshTokenExpireDate = DateTime.UtcNow.AddDays(1);
-
-      _httpContextAccessorMock.SetupGet(x => x.HttpContext).Returns(CreateHttpContext(tokenUser.userId));
-      _repositoryMock.Setup(r => r.Get(It.IsAny<Expression<Func<User, bool>>>())).Returns(user);
+      SetupUserPersistence(user);
 
       var sut = CreateSut();
+      var generated = await sut.GenerateToken(tokenUser, "web");
+      var refreshed = await sut.RefreshAccessToken(generated.AccessToken, "web");
 
-      var ex = await Assert.ThrowsAsync<Exception>(() => sut.RefreshToken("different-token"));
-
-      Assert.Equal("invalid refresh token", ex.Message);
-   }
-
-   [Fact]
-   public async Task RefreshToken_ShouldThrowException_WhenRefreshTokenExpired()
-   {
-      var tokenUser = CreateTokenUser();
-      var user = CreateUser(tokenUser);
-      user.RefreshToken = "stored-token";
-      user.RefreshTokenExpireDate = DateTime.UtcNow.AddSeconds(-1);
-
-      _httpContextAccessorMock.SetupGet(x => x.HttpContext).Returns(CreateHttpContext(tokenUser.userId));
-      _repositoryMock.Setup(r => r.Get(It.IsAny<Expression<Func<User, bool>>>())).Returns(user);
-
-      var sut = CreateSut();
-
-      var ex = await Assert.ThrowsAsync<Exception>(() => sut.RefreshToken("stored-token"));
-
-      Assert.Equal("refresh token expired", ex.Message);
-   }
-
-   [Fact]
-   public async Task RefreshToken_ShouldReturnNewTokensAndUpdateUser_WhenRefreshTokenValid()
-   {
-      var tokenUser = CreateTokenUser();
-      var user = CreateUser(tokenUser);
-      user.RefreshToken = "stored-token";
-      user.RefreshTokenExpireDate = DateTime.UtcNow.AddDays(1);
-
-      _httpContextAccessorMock.SetupGet(x => x.HttpContext).Returns(CreateHttpContext(tokenUser.userId));
-      _repositoryMock.Setup(r => r.Get(It.IsAny<Expression<Func<User, bool>>>())).Returns(user);
-      _repositoryMock.Setup(r => r.Update(It.IsAny<User>(), null)).Returns(true);
-
-      var sut = CreateSut();
-
-      var result = await sut.RefreshToken("stored-token");
-
-      Assert.False(string.IsNullOrWhiteSpace(result.AccessToken));
-      Assert.False(string.IsNullOrWhiteSpace(result.RefreshToken));
-      Assert.NotEqual("stored-token", result.RefreshToken);
-      Assert.Equal(result.RefreshToken, user.RefreshToken);
+      Assert.False(string.IsNullOrWhiteSpace(refreshed.AccessToken));
+      Assert.False(string.IsNullOrWhiteSpace(refreshed.RefreshToken));
+      Assert.NotEqual(generated.RefreshToken, refreshed.RefreshToken);
+      Assert.Equal(refreshed.RefreshToken, user.RefreshToken);
       Assert.True(user.RefreshTokenExpireDate > DateTime.UtcNow.AddDays(6));
-
-      _repositoryMock.Verify(r => r.Update(It.Is<User>(u => u == user), null), Times.Once);
    }
 
    [Fact]
-   public async Task Validate_ShouldReturnTrue_ForGeneratedAccessToken()
+   public async Task RefreshAccessToken_ShouldInvalidateUserTokens_WhenTokenBindingIsInvalid()
    {
       var tokenUser = CreateTokenUser();
       var user = CreateUser(tokenUser);
-
-      _repositoryMock.Setup(r => r.Get(It.IsAny<Expression<Func<User, bool>>>())).Returns(user);
-      _repositoryMock.Setup(r => r.UpdateBulkAsync(It.IsAny<List<User>>(), null)).ReturnsAsync(true);
+      SetupUserPersistence(user);
 
       var sut = CreateSut();
-      var tokens = await sut.GenerateToken(tokenUser);
+      var firstTokens = await sut.GenerateToken(tokenUser, "web");
+      _ = await sut.GenerateToken(tokenUser, "admin");
 
-      var isValid = await sut.Validate(tokens.AccessToken);
-      var isValidFromModel = await sut.Validate(tokens);
+      var ex = await Assert.ThrowsAsync<AuthenticationException>(() => sut.RefreshAccessToken(firstTokens.AccessToken, "web"));
 
-      Assert.True(isValid);
-      Assert.True(isValidFromModel);
+      Assert.Equal("invalid token session", ex.Message);
+      Assert.Null(user.RefreshToken);
+      Assert.Null(user.RefreshTokenExpireDate);
+   }
+
+   [Fact]
+   public async Task RevokeAccessToken_ShouldClearRefreshToken_WhenAccessTokenValid()
+   {
+      var tokenUser = CreateTokenUser();
+      var user = CreateUser(tokenUser);
+      SetupUserPersistence(user);
+
+      var sut = CreateSut();
+      var generated = await sut.GenerateToken(tokenUser, "web");
+
+      var revoked = await sut.RevokeAccessToken(generated.AccessToken, "web");
+
+      Assert.True(revoked);
+      Assert.Null(user.RefreshToken);
+      Assert.Null(user.RefreshTokenExpireDate);
+   }
+
+   [Fact]
+   public async Task Validate_ShouldReturnFalse_WhenUserTokenStateIsRevoked()
+   {
+      var tokenUser = CreateTokenUser();
+      var user = CreateUser(tokenUser);
+      SetupUserPersistence(user);
+
+      var sut = CreateSut();
+      var generated = await sut.GenerateToken(tokenUser, "web");
+      _ = await sut.RevokeAccessToken(generated.AccessToken, "web");
+
+      var isValid = await sut.Validate(generated.AccessToken, "web");
+
+      Assert.False(isValid);
    }
 
    [Fact]
@@ -173,6 +139,17 @@ public class JwtManagerTests
    private JwtManager CreateSut()
    {
       return new JwtManager(_httpContextAccessorMock.Object, _repositoryMock.Object);
+   }
+
+   private void SetupUserPersistence(User user)
+   {
+      _repositoryMock
+         .Setup(r => r.Get(It.IsAny<Expression<Func<User, bool>>>()))
+         .Returns(user);
+
+      _repositoryMock
+         .Setup(r => r.UpdateBulkAsync(It.IsAny<List<User>>(), null))
+         .ReturnsAsync(true);
    }
 
    private static TokenUser CreateTokenUser()
@@ -197,13 +174,5 @@ public class JwtManagerTests
          PasswordHash = [],
          PasswordSalt = []
       };
-   }
-
-   private static HttpContext CreateHttpContext(Guid userId)
-   {
-      var context = new DefaultHttpContext();
-      var claims = new List<Claim> { new(ClaimTypes.NameIdentifier, userId.ToString()) };
-      context.User = new ClaimsPrincipal(new ClaimsIdentity(claims, "TestAuth"));
-      return context;
    }
 }

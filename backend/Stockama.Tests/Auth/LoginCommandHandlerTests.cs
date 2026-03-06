@@ -3,6 +3,8 @@ using Moq;
 using Stockama.Application.Auth.Commands.LoginCommand;
 using Stockama.Core.Authorization;
 using Stockama.Core.Authorization.Models;
+using Stockama.Core.Cache;
+using Stockama.Core.Cache.CacheModels;
 using Stockama.Core.Data;
 using Stockama.Core.Resources;
 using Stockama.Core.Security;
@@ -16,6 +18,7 @@ public class LoginCommandHandlerTests
    private readonly Mock<IPasswordHasher> _passwordHasherMock;
    private readonly Mock<IJwtManager> _jwtManagerMock;
    private readonly Mock<IResourceManager> _resourceManagerMock;
+   private readonly Mock<ICacheManager> _cacheManagerMock;
 
    public LoginCommandHandlerTests()
    {
@@ -23,6 +26,7 @@ public class LoginCommandHandlerTests
       _passwordHasherMock = new Mock<IPasswordHasher>();
       _jwtManagerMock = new Mock<IJwtManager>();
       _resourceManagerMock = new Mock<IResourceManager>();
+      _cacheManagerMock = new Mock<ICacheManager>();
    }
 
    [Fact]
@@ -45,16 +49,21 @@ public class LoginCommandHandlerTests
          .Setup(q => q.UpdateAsync(user, user.Id))
          .ReturnsAsync(true);
 
+      _cacheManagerMock
+         .Setup(q => q.GetCompanyCacheList())
+         .ReturnsAsync([new CompanyCacheModel { Id = user.CompanyId, CompanyCode = "acme" }]);
+
       _jwtManagerMock
-         .Setup(q => q.GenerateToken(It.IsAny<TokenUser>()))
+         .Setup(q => q.GenerateToken(It.IsAny<TokenUser>(), It.IsAny<string>()))
          .ReturnsAsync(new JwtTokens("access", "refresh", DateTime.UtcNow.AddHours(1)));
 
-      var sut = new LoginCommandHandler(_resourceManagerMock.Object, _userRepositoryMock.Object, _passwordHasherMock.Object, _jwtManagerMock.Object);
+      var sut = new LoginCommandHandler(_resourceManagerMock.Object, _userRepositoryMock.Object, _passwordHasherMock.Object, _jwtManagerMock.Object, _cacheManagerMock.Object);
 
       var result = await sut.HandleAsync(new LoginCommand
       {
          Username = user.Username,
-         Password = "otp-password"
+         Password = "otp-password",
+         CompanyCode = "acme"
       });
 
       Assert.True(result.IsSuccess);
@@ -79,16 +88,21 @@ public class LoginCommandHandlerTests
          .Setup(q => q.VerifyPassword("otp-password", user.PasswordSalt, user.PasswordHash))
          .Returns(true);
 
-      var sut = new LoginCommandHandler(_resourceManagerMock.Object, _userRepositoryMock.Object, _passwordHasherMock.Object, _jwtManagerMock.Object);
+      _cacheManagerMock
+         .Setup(q => q.GetCompanyCacheList())
+         .ReturnsAsync([new CompanyCacheModel { Id = user.CompanyId, CompanyCode = "acme" }]);
+
+      var sut = new LoginCommandHandler(_resourceManagerMock.Object, _userRepositoryMock.Object, _passwordHasherMock.Object, _jwtManagerMock.Object, _cacheManagerMock.Object);
 
       var result = await sut.HandleAsync(new LoginCommand
       {
          Username = user.Username,
-         Password = "otp-password"
+         Password = "otp-password",
+         CompanyCode = "acme"
       });
 
       Assert.False(result.IsSuccess);
-      _jwtManagerMock.Verify(q => q.GenerateToken(It.IsAny<TokenUser>()), Times.Never);
+      _jwtManagerMock.Verify(q => q.GenerateToken(It.IsAny<TokenUser>(), It.IsAny<string>()), Times.Never);
    }
 
    private static User CreateTenantAdminUser()
