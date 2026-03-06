@@ -1,4 +1,5 @@
 using Stockama.Utils.Extensions;
+using Stockama.Helper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddEnvironmentVariables();
+EnvironmentVariables.AuthClientType = "web";
 
 builder.Services.AddCommonServices();
 
@@ -23,6 +25,7 @@ if (app.Environment.IsDevelopment())
 
 app.AddCommonServices();
 // app.UseHttpsRedirection();
+app.UseGlobalErrorHandler();
 
 app.UseCustomAuthenticationMiddleware();
 app.UseAuthenticationMiddleware();

@@ -2,6 +2,7 @@ using Ganss.Xss;
 using Stockama.Core.Middlewares;
 using Stockama.Utils.Extensions;
 using Stockama.API.Admin.Middlewares;
+using Stockama.Helper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddEnvironmentVariables();
+EnvironmentVariables.AuthClientType = "admin";
 
 builder.Services.AddCommonServices();
 builder.Services.AddSingleton<IHtmlSanitizer>(_ => new HtmlSanitizer());
@@ -27,10 +29,11 @@ if (app.Environment.IsDevelopment())
 
 app.AddCommonServices();
 // app.UseHttpsRedirection();
+app.UseGlobalErrorHandler();
 
 app.UseCustomAuthenticationMiddleware();
+app.UseAuthenticationMiddleware();
 app.UseMiddleware<SuperAdminOnlyMiddleware>();
-// app.UseAuthenticationMiddleware();
 
 app.MapControllers();
 
