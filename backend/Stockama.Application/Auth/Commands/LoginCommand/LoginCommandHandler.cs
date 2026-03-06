@@ -1,6 +1,6 @@
 using LiteBus.Commands.Abstractions;
 using Stockama.Core.Authorization;
-using Stockama.Application.Authorization.Models;
+using Stockama.Application.Auth.Models;
 using Stockama.Core.Base;
 using Stockama.Core.Data;
 using Stockama.Core.Model.Response;
@@ -8,6 +8,7 @@ using Stockama.Core.Resources;
 using Stockama.Core.Security;
 using Stockama.Data.Domain;
 using Stockama.Core.Authorization.Models;
+using Stockama.Core.Cache;
 
 namespace Stockama.Application.Auth.Commands.LoginCommand;
 
@@ -16,22 +17,33 @@ public sealed class LoginCommandHandler : BaseHandler, ICommandHandler<LoginComm
     private readonly IRepository<User> _userRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJwtManager _jwtManager;
+    private readonly ICacheManager _cacheManager;
 
     public LoginCommandHandler(
         IResourceManager resourceManager,
         IRepository<User> userRepository,
         IPasswordHasher passwordHasher,
-        IJwtManager jwtManager) : base(resourceManager)
+        IJwtManager jwtManager,
+        ICacheManager cacheManager) : base(resourceManager)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
         _jwtManager = jwtManager;
+        _cacheManager = cacheManager;
     }
 
     public async Task<IBaseDataResponse<LoginResponse>> HandleAsync(LoginCommand message, CancellationToken cancellationToken = default)
     {
         var user = await _userRepository.GetActiveAsync(u => u.Username.ToLower() == message.Username.ToLower());
         if (user == null)
+        {
+            return new ErrorDataResponse<LoginResponse>("401", await T("api_auth_usernotfound", message.LanguageId));
+        }
+
+        var company = (await _cacheManager.GetCompanyCacheList())
+            .FirstOrDefault(f => f.Id == user.CompanyId && f.CompanyCode.Equals(message.CompanyCode, StringComparison.OrdinalIgnoreCase));
+
+        if (company is null)
         {
             return new ErrorDataResponse<LoginResponse>("401", await T("api_auth_usernotfound", message.LanguageId));
         }
@@ -67,7 +79,7 @@ public sealed class LoginCommandHandler : BaseHandler, ICommandHandler<LoginComm
             user.IsSuperAdmin,
             user.IsTenantAdmin,
             user.MustChangePassword);
-        var tokens = await _jwtManager.GenerateToken(tokenUser);
+        var tokens = await _jwtManager.GenerateToken(tokenUser, message.ClientType);
 
         var response = new LoginResponse(tokens.AccessToken, tokens.ValidTo, requirePasswordChange);
 
