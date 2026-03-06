@@ -1,16 +1,15 @@
 export type Guid = string
 
+export interface ApiResponseEnvelope<TData> {
+  isSuccess: boolean
+  status: string
+  message: string
+  total?: number
+  data: TData
+}
+
 export interface ApiError {
   message: string
   status?: number
   details?: unknown
-}
-
-export interface ApiListResponse<T> {
-  data: T[]
-  totalCount?: number
-}
-
-export interface ApiDataResponse<T> {
-  data: T
 }

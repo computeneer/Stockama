@@ -1,4 +1,4 @@
-import type { ApiListResponse, Guid } from '../common'
+import type { ApiResponseEnvelope, Guid } from '../common'
 
 export interface CompanyDto {
   id: Guid
@@ -7,4 +7,5 @@ export interface CompanyDto {
   createdOn?: string
 }
 
-export type CompanyListResponse = ApiListResponse<CompanyDto>
+export type CompanyListResponse = ApiResponseEnvelope<CompanyDto[]>
+export type CreateCompanyResponse = ApiResponseEnvelope<boolean>

@@ -1,5 +1,5 @@
 import type { ApiClient } from './http-client'
-import type { CompanyListRequest, CompanyListResponse, CreateCompanyRequest, CompanyDto } from '../types'
+import type { CompanyListRequest, CompanyListResponse, CreateCompanyRequest, CreateCompanyResponse } from '../types'
 
 function toQueryString(params: Record<string, string | number | undefined>) {
   const query = new URLSearchParams()
@@ -26,7 +26,7 @@ export function createCompanyApi(client: ApiClient) {
       return client.get<CompanyListResponse>(`/api/company/list${query}`)
     },
     create(request: CreateCompanyRequest) {
-      return client.post<CreateCompanyRequest, CompanyDto>('/api/company/create', request)
+      return client.post<CreateCompanyRequest, CreateCompanyResponse>('/api/company/create', request)
     },
   }
 }

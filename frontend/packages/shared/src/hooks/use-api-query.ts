@@ -8,12 +8,25 @@ export interface ApiQueryState<TData> {
   refetch: () => Promise<void>
 }
 
-export function useApiQuery<TData>(queryFn: () => Promise<TData>, deps: unknown[] = []): ApiQueryState<TData> {
+export interface UseApiQueryOptions {
+  enabled?: boolean
+}
+
+export function useApiQuery<TData>(
+  queryFn: () => Promise<TData>,
+  deps: unknown[] = [],
+  options: UseApiQueryOptions = {},
+): ApiQueryState<TData> {
+  const { enabled = true } = options
   const [data, setData] = useState<TData | null>(null)
   const [error, setError] = useState<ApiError | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
   const refetch = useCallback(async () => {
+    if (!enabled) {
+      return
+    }
+
     setIsLoading(true)
     setError(null)
 
@@ -25,11 +38,16 @@ export function useApiQuery<TData>(queryFn: () => Promise<TData>, deps: unknown[
     } finally {
       setIsLoading(false)
     }
-  }, deps)
+  }, [enabled, ...deps])
 
   useEffect(() => {
+    if (!enabled) {
+      setIsLoading(false)
+      return
+    }
+
     void refetch()
-  }, [refetch])
+  }, [enabled, refetch])
 
   return {
     data,
