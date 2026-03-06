@@ -15,8 +15,17 @@ public class SuperAdminOnlyMiddleware
 
    public async Task InvokeAsync(HttpContext context, IJwtManager jwtManager)
    {
+      var allowedUrls = new[]
+      {
+         "/api/auth/login",
+         "/api/auth/refresh",
+         "/api/auth/validate",
+         "/api/auth/logout",
+         "/api/auth/revoke",
+      };
+
       var path = context.Request.Path.Value?.ToLowerInvariant() ?? string.Empty;
-      if (path.StartsWith("/openapi"))
+      if (path.StartsWith("/openapi") || allowedUrls.Contains(path))
       {
          await _next(context);
          return;
