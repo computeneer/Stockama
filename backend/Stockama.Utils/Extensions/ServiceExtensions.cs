@@ -13,6 +13,7 @@ using Stockama.Core.Resources;
 using Stockama.Core.Cache;
 using Stockama.Core.Tenants;
 using Stockama.Core.Queue;
+using Stockama.Helper.Constants;
 
 using LiteBus.Extensions.Microsoft.DependencyInjection;
 using LiteBus.Commands;
@@ -80,6 +81,7 @@ public static class ServiceExtensions
                   "https://localhost:5174",
                   "http://127.0.0.1:5174",
                   "https://[::1]:5174")
+               .WithExposedHeaders(MiddlewareConstants.RefreshedAccessTokenHeaderName)
                .AllowAnyHeader()
                .AllowAnyMethod()
                .AllowCredentials();
