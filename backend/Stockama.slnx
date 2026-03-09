@@ -1,0 +1,13 @@
+<Solution>
+  <Project Path="Stockama.API.Admin/Stockama.API.Admin.csproj" />
+  <Project Path="Stockama.API.Common/Stockama.API.Common.csproj" />
+  <Project Path="Stockama.API.Company/Stockama.API.Company.csproj" />
+  <Project Path="Stockama.API.User/Stockama.API.User.csproj" />
+  <Project Path="Stockama.Application/Stockama.Application.csproj" />
+  <Project Path="Stockama.Core/Stockama.Core.csproj" />
+  <Project Path="Stockama.Data/Stockama.Data.csproj" />
+  <Project Path="Stockama.Helper/Stockama.Helper.csproj" />
+  <Project Path="Stockama.Utils/Stockama.Utils.csproj" />
+  <Project Path="Stockama.Seeder/Stockama.Seeder.csproj" />
+  <Project Path="Stockama.Tests/Stockama.Tests.csproj" />
+</Solution>

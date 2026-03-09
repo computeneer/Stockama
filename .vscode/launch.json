@@ -5,10 +5,42 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "C#: Stockama.API.Common Debug",
+			"name": "Stockama.API.Common",
 			"type": "dotnet",
 			"request": "launch",
-			"projectPath": "${workspaceFolder}/Stockama.API.Common/Stockama.API.Common.csproj"
+			"projectPath": "${workspaceFolder}/backend/Stockama.API.Common/Stockama.API.Common.csproj"
+		},
+		{
+			"name": "Stockama.API.Admin",
+			"type": "dotnet",
+			"request": "launch",
+			"projectPath": "${workspaceFolder}/backend/Stockama.API.Admin/Stockama.API.Admin.csproj"
+		},
+		{
+			"name": "Stockama.API.Company",
+			"type": "dotnet",
+			"request": "launch",
+			"projectPath": "${workspaceFolder}/backend/Stockama.API.Company/Stockama.API.Company.csproj"
+		},
+		{
+			"name": "Stockama.API.User",
+			"type": "dotnet",
+			"request": "launch",
+			"projectPath": "${workspaceFolder}/backend/Stockama.API.User/Stockama.API.User.csproj"
+		},
+		{
+			"name": "SEEDER",
+			"type": "dotnet",
+			"request": "launch",
+			"projectPath": "${workspaceFolder}/backend/Stockama.Seeder/Stockama.Seeder.csproj"
+		}
+	],
+	"compounds": [
+		{
+			"name": "Run all API",
+			"preLaunchTask": "build",
+			"configurations": ["Stockama.API.Admin", "Stockama.API.Common", "Stockama.API.Company", "Stockama.API.User"],
+			"stopAll": true
 		}
 	]
 }
