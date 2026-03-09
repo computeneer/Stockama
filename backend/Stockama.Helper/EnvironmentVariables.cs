@@ -53,7 +53,7 @@ public class EnvironmentVariables
       {
          if (string.IsNullOrEmpty(_dbUser))
          {
-            _dbUser = Environment.GetEnvironmentVariable("STOCKAMA_DB_USER") ?? "postgres";
+            _dbUser = Environment.GetEnvironmentVariable("STOCKAMA_DB_USERNAME") ?? "postgres";
          }
          return _dbUser;
       }
@@ -97,7 +97,7 @@ public class EnvironmentVariables
       {
          if (string.IsNullOrEmpty(_redisServiceEndpoint))
          {
-            _redisServiceEndpoint = Environment.GetEnvironmentVariable("BACKPAG_REDIS_SERVISE_ENDPOINT") ?? "";
+            _redisServiceEndpoint = Environment.GetEnvironmentVariable("STOCKAMA_REDIS_SERVISE_ENDPOINT") ?? "";
          }
 
          return _redisServiceEndpoint;
@@ -114,7 +114,7 @@ public class EnvironmentVariables
       {
          if (string.IsNullOrEmpty(_redisServicePort))
          {
-            _redisServicePort = Environment.GetEnvironmentVariable("BACKPAG_REDIS_SERVICE_PORT") ?? "";
+            _redisServicePort = Environment.GetEnvironmentVariable("STOCKAMA_REDIS_SERVICE_PORT") ?? "";
          }
          return _redisServicePort;
       }
@@ -130,7 +130,7 @@ public class EnvironmentVariables
       {
          if (string.IsNullOrEmpty(_redisServicePassword))
          {
-            _redisServicePassword = Environment.GetEnvironmentVariable("BACKPAG_REDIS_SERVISE_PASSWORD") ?? "";
+            _redisServicePassword = Environment.GetEnvironmentVariable("STOCKAMA_REDIS_SERVISE_PASSWORD") ?? "";
          }
 
          return _redisServicePassword;
