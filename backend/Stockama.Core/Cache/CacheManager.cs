@@ -24,6 +24,11 @@ public sealed class CacheManager : ICacheManager
       _companyRepository = companyRepository;
    }
 
+   public async Task CreateOrSetRefreshToken(string cacheKey, RefreshTokenCacheModel cacheModel, TimeSpan? expiry)
+   {
+      await _cacheUnit.SetAsync(cacheKey, cacheModel, expiry);
+   }
+
    public void DeleteCompanyCache()
    {
       _cacheUnit.Remove(ApplicationContants.COMPANY_CACHEKEY);
@@ -34,6 +39,10 @@ public sealed class CacheManager : ICacheManager
       _cacheUnit.Remove(ApplicationContants.LANGUAGE_CACHEKEY);
    }
 
+   public void DeleteRefreshToken(string cacheKey)
+   {
+      _cacheUnit.Remove(cacheKey);
+   }
 
    public void DeleteResourceCache()
    {
@@ -46,7 +55,7 @@ public sealed class CacheManager : ICacheManager
 
    public async ValueTask<List<CompanyCacheModel>> GetCompanyCacheList()
    {
-      return await _cacheUnit.FetchAsync(ApplicationContants.COMPANY_CACHEKEY, async () =>
+      return (await _cacheUnit.FetchAsync(ApplicationContants.COMPANY_CACHEKEY, async () =>
       {
          var result = await _companyRepository.AllActiveAsync();
          return result.Select(f => new CompanyCacheModel
@@ -54,13 +63,16 @@ public sealed class CacheManager : ICacheManager
             CompanyCode = f.CompanyCode,
             Name = f.Name,
             Id = f.Id,
+            Description = f.Description ?? string.Empty,
+            LogoUrl = f.LogoUrl ?? string.Empty,
+            WebsiteUrl = f.WebsiteUrl ?? string.Empty
          }).ToList();
-      });
+      }))!;
    }
 
    public async ValueTask<List<LanguageCacheModel>> GetLanguageCacheList()
    {
-      return await _cacheUnit.FetchAsync(ApplicationContants.LANGUAGE_CACHEKEY, async () =>
+      return (await _cacheUnit.FetchAsync(ApplicationContants.LANGUAGE_CACHEKEY, async () =>
       {
          var result = await _languageRepository.AllActiveAsync();
          return result.Select(f => new LanguageCacheModel
@@ -68,7 +80,12 @@ public sealed class CacheManager : ICacheManager
             Id = f.Id,
             Name = f.Name,
          }).ToList();
-      });
+      }))!;
+   }
+
+   public async ValueTask<RefreshTokenCacheModel> GetRefreshTokenCache(string cacheKey)
+   {
+      return await _cacheUnit.GetAsync<RefreshTokenCacheModel>(cacheKey);
    }
 
    public async ValueTask<Dictionary<Guid, Dictionary<string, string>>> GetResourceAllList()
@@ -92,12 +109,12 @@ public sealed class CacheManager : ICacheManager
          throw new CustomValidationException(nameof(languageId));
       }
 
-      return await _cacheUnit.FetchAsync(string.Format(ApplicationContants.RESOURCE_CACHEKEY, languageId), async () =>
+      return (await _cacheUnit.FetchAsync(string.Format(ApplicationContants.RESOURCE_CACHEKEY, languageId), async () =>
       {
          var result = (await _resourceRepository.FilterAsync(f => f.LanguageId == languageId)).ToDictionary(f => f.Key, f => f.Value);
 
          return result;
-      });
+      }))!;
    }
 
 }
