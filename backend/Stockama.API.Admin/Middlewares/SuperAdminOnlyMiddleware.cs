@@ -40,14 +40,14 @@ public class SuperAdminOnlyMiddleware
 
       var authHeader = context.Request.Headers.Authorization.ToString();
 
-      if (string.IsNullOrEmpty(authHeader))
+      if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer ") || authHeader == "Bearer " || authHeader == "Bearer null")
       {
          context.Response.StatusCode = StatusCodes.Status403Forbidden;
          await context.Response.WriteAsJsonAsync(new ErrorBoolResponse("403", "Token not found."));
          return;
       }
 
-      var tokenValidationResult = await jwtManager.Validate(authHeader);
+      var tokenValidationResult = await jwtManager.Validate(authHeader.Split(" ")[1]);
       if (!tokenValidationResult)
       {
          context.Response.StatusCode = StatusCodes.Status403Forbidden;
