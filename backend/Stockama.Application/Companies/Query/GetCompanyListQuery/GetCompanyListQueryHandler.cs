@@ -1,26 +1,25 @@
 using LiteBus.Queries.Abstractions;
 using Stockama.Application.Companies.Models;
 using Stockama.Core.Base;
-using Stockama.Core.Data;
+using Stockama.Core.Cache;
 using Stockama.Core.Model.Response;
 using Stockama.Core.Resources;
-using Stockama.Data.Domain;
 
 namespace Stockama.Application.Companies.Query.GetCompanyListQuery;
 
 public sealed class GetCompanyListQueryHandler : BaseHandler, IQueryHandler<GetCompanyListQuery, IBaseListResponse<CompanyDto>>
 {
 
-   private readonly IRepository<Company> _companyRepository;
+   private readonly ICacheManager _cacheManager;
 
-   public GetCompanyListQueryHandler(IResourceManager resourceManager, IRepository<Company> companyRepository) : base(resourceManager)
+   public GetCompanyListQueryHandler(IResourceManager resourceManager, ICacheManager cacheManager) : base(resourceManager)
    {
-      _companyRepository = companyRepository;
+      _cacheManager = cacheManager;
    }
 
    public async Task<IBaseListResponse<CompanyDto>> HandleAsync(GetCompanyListQuery message, CancellationToken cancellationToken = default)
    {
-      var companies = await _companyRepository.AllActiveAsync();
+      var companies = await _cacheManager.GetCompanyCacheList();
 
       var dtoList = companies.Select(q => new CompanyDto
       {
