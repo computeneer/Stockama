@@ -159,11 +159,11 @@ public class TenantProvisionManagerTests
       {
          SuperAdminUserId = Guid.NewGuid(),
          CompanyName = "ACME",
-         Description = "Tenant",
+         Description = "Admin",
          CompanyCode = "acme",
          LogoUrl = string.Empty,
          WebsiteUrl = string.Empty,
-         AdminFirstName = "Tenant",
+         AdminFirstName = "Admin",
          AdminLastName = "Admin",
          AdminEmail = "admin@acme.local"
       };

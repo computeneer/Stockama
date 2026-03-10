@@ -1,5 +1,6 @@
 using Moq;
 using Stockama.Application.Companies.Command.CreateCompanyCommand;
+using Stockama.Core.Cache;
 using Stockama.Core.Resources;
 using Stockama.Core.Tenants;
 using Stockama.Core.Tenants.Models;
@@ -9,11 +10,13 @@ namespace Stockama.Tests.Companies;
 public class CreateCompanyCommandHandlerTests
 {
    private readonly Mock<IResourceManager> _resourceManagerMock;
+   private readonly Mock<ICacheManager> _cacheManagerMock;
    private readonly Mock<ITenantProvisionManager> _tenantProvisionManagerMock;
 
    public CreateCompanyCommandHandlerTests()
    {
       _resourceManagerMock = new Mock<IResourceManager>();
+      _cacheManagerMock = new Mock<ICacheManager>();
       _tenantProvisionManagerMock = new Mock<ITenantProvisionManager>();
    }
 
@@ -27,7 +30,9 @@ public class CreateCompanyCommandHandlerTests
          .Callback<TenantProvisionRequest, CancellationToken>((request, _) => capturedRequest = request)
          .ReturnsAsync(new TenantProvisionResult(Guid.NewGuid(), Guid.NewGuid(), "admin.acme", "admin@acme.local"));
 
-      var sut = new CreateCompanyCommandHandler(_resourceManagerMock.Object, _tenantProvisionManagerMock.Object);
+      var sut = new CreateCompanyCommandHandler(_resourceManagerMock.Object,
+                                                _tenantProvisionManagerMock.Object,
+                                                _cacheManagerMock.Object);
 
       var result = await sut.HandleAsync(new CreateCompanyCommand
       {
@@ -37,7 +42,7 @@ public class CreateCompanyCommandHandlerTests
          LogoUrl = "logo",
          WebsiteUrl = "site",
          CompanyCode = "acme",
-         AdminFirstName = "Tenant",
+         AdminFirstName = "Admin",
          AdminLastName = "Admin",
          AdminEmail = "admin@acme.local"
       });

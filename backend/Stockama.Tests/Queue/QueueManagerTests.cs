@@ -8,14 +8,12 @@ namespace Stockama.Tests.Queue;
 
 public class QueueManagerTests
 {
-   private readonly Mock<IBackgroundTaskManager> _backgroundTaskManagerMock;
    private readonly Mock<IMessageTemplateManager> _messageTemplateManagerMock;
    private readonly Mock<IQueueTransportManager> _queueTransportManagerMock;
    private readonly Mock<ILogger<QueueManager>> _loggerMock;
 
    public QueueManagerTests()
    {
-      _backgroundTaskManagerMock = new Mock<IBackgroundTaskManager>();
       _messageTemplateManagerMock = new Mock<IMessageTemplateManager>();
       _queueTransportManagerMock = new Mock<IQueueTransportManager>();
       _loggerMock = new Mock<ILogger<QueueManager>>();
@@ -26,16 +24,11 @@ public class QueueManagerTests
    {
       Func<CancellationToken, Task>? queuedWorkItem = null;
 
-      _backgroundTaskManagerMock
-         .Setup(q => q.QueueWorkItem(It.IsAny<Func<CancellationToken, Task>>()))
-         .Callback<Func<CancellationToken, Task>>(callback => queuedWorkItem = callback);
-
       _messageTemplateManagerMock
          .Setup(q => q.RenderAsync("template.key", It.IsAny<Guid>(), It.IsAny<IReadOnlyDictionary<string, string>>(), It.IsAny<CancellationToken>()))
          .ReturnsAsync(new RenderedTemplateMessage("Subject", "Body"));
 
       var sut = new QueueManager(
-         _backgroundTaskManagerMock.Object,
          _messageTemplateManagerMock.Object,
          _queueTransportManagerMock.Object,
          _loggerMock.Object);
@@ -64,7 +57,6 @@ public class QueueManagerTests
    public async Task EnqueueTemplateMessageAsync_ShouldThrowValidation_WhenRecipientMissing()
    {
       var sut = new QueueManager(
-         _backgroundTaskManagerMock.Object,
          _messageTemplateManagerMock.Object,
          _queueTransportManagerMock.Object,
          _loggerMock.Object);

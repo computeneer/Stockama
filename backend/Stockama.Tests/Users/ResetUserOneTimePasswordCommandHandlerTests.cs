@@ -54,7 +54,7 @@ public class ResetUserOneTimePasswordCommandHandlerTests
             Id = targetUserId,
             CompanyId = companyId,
             LanguageId = Guid.Parse(ApplicationContants.DefaultLanguageId),
-            FirstName = "Tenant",
+            FirstName = "Admin",
             LastName = "Admin",
             Username = "tenant.admin",
             Email = "tenant@x.com",
