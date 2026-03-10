@@ -5,10 +5,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Stockama.Core.Authorization.Models;
+using Stockama.Core.Cache;
+using Stockama.Core.Cache.CacheModels;
 using Stockama.Core.Data;
 using Stockama.Core.Exeptions;
 using Stockama.Data.Domain;
 using Stockama.Helper;
+using Stockama.Helper.Constants;
 
 namespace Stockama.Core.Authorization;
 
@@ -19,9 +22,9 @@ public class JwtManager : IJwtManager
    private readonly byte[] _jwtTokenKey;
    private readonly TokenValidationParameters _tokenValidationParameters;
    private readonly IRepository<User> _userRepository;
+   private readonly ICacheManager _cacheManager;
 
-
-   public JwtManager(IHttpContextAccessor httpContextAccessor, IRepository<User> userRepository)
+   public JwtManager(IHttpContextAccessor httpContextAccessor, IRepository<User> userRepository, ICacheManager cacheManager)
    {
       _tokenHandler = new JsonWebTokenHandler();
       _jwtTokenKey = Encoding.UTF8.GetBytes(EnvironmentVariables.JwtTokenKey);
@@ -38,6 +41,7 @@ public class JwtManager : IJwtManager
       };
       _ = httpContextAccessor;
       _userRepository = userRepository;
+      _cacheManager = cacheManager;
    }
 
    public async Task<JwtTokens> GenerateToken(TokenUser tokenUser)
@@ -53,6 +57,15 @@ public class JwtManager : IJwtManager
 
       var user = _userRepository.Get(q => q.Id == tokenUser.userId);
       var existingUser = user ?? throw new AuthenticationException("User not found");
+
+      var cacheKey = GenerateCacheKey(tokenUser.userId, normalizedClientType);
+      var cacheModel = new RefreshTokenCacheModel
+      {
+         RefreshToken = newRefreshToken,
+         ExpireDate = DateTime.UtcNow.AddDays(RefreshTokenExpirationDays)
+      };
+
+      await _cacheManager.CreateOrSetRefreshToken(cacheKey, cacheModel, TimeSpan.FromDays(RefreshTokenExpirationDays));
 
       existingUser.RefreshToken = newRefreshToken;
       existingUser.RefreshTokenExpireDate = DateTime.UtcNow.AddDays(RefreshTokenExpirationDays);
@@ -71,19 +84,21 @@ public class JwtManager : IJwtManager
          throw new AuthenticationException("invalid access token");
       }
 
-      var user = _userRepository.Get(q => q.Id == userId);
+      var user = await _userRepository.GetActiveAsync(q => q.Id == userId);
       var existingUser = user ?? throw new AuthenticationException("User not found");
 
-      if (!HasUsableRefreshToken(existingUser))
+      var cacheKey = GenerateCacheKey(userId, normalizedClientType);
+      var cacheModel = await _cacheManager.GetRefreshTokenCache(cacheKey);
+      if (cacheModel == null || string.IsNullOrWhiteSpace(cacheModel.RefreshToken) || cacheModel.ExpireDate <= DateTime.UtcNow)
       {
-         await InvalidateUserTokens(existingUser);
+         await InvalidateUserTokens(existingUser, normalizedClientType);
          throw new AuthenticationException("refresh token expired");
       }
 
-      if (!MatchesClientType(existingUser.RefreshToken!, normalizedClientType)
-         || !IsRefreshTokenBoundToAccessToken(existingUser.RefreshToken!, accessToken, normalizedClientType))
+      if (!MatchesClientType(cacheModel.RefreshToken, normalizedClientType)
+         || !IsRefreshTokenBoundToAccessToken(cacheModel.RefreshToken, accessToken, normalizedClientType))
       {
-         await InvalidateUserTokens(existingUser);
+         await InvalidateUserTokens(existingUser, normalizedClientType);
          throw new AuthenticationException("invalid token session");
       }
 
@@ -98,6 +113,13 @@ public class JwtManager : IJwtManager
 
       var (token, validTo) = GenerateAccessToken(tokenUser, normalizedClientType);
       var newRefreshToken = GenerateRefreshToken(token, normalizedClientType);
+
+      var newCacheModel = new RefreshTokenCacheModel
+      {
+         RefreshToken = newRefreshToken,
+         ExpireDate = DateTime.UtcNow.AddDays(RefreshTokenExpirationDays)
+      };
+      await _cacheManager.CreateOrSetRefreshToken(cacheKey, newCacheModel, TimeSpan.FromDays(RefreshTokenExpirationDays));
 
       existingUser.RefreshToken = newRefreshToken;
       existingUser.RefreshTokenExpireDate = DateTime.UtcNow.AddDays(RefreshTokenExpirationDays);
@@ -127,12 +149,19 @@ public class JwtManager : IJwtManager
       }
 
       var user = _userRepository.Get(q => q.Id == userId);
-      if (user == null || string.IsNullOrWhiteSpace(user.RefreshToken))
+      if (user == null)
       {
          return false;
       }
 
-      await InvalidateUserTokens(user);
+      var cacheKey = GenerateCacheKey(userId, normalizedClientType);
+      var cacheModel = await _cacheManager.GetRefreshTokenCache(cacheKey);
+      if (cacheModel == null || string.IsNullOrWhiteSpace(cacheModel.RefreshToken))
+      {
+         return false;
+      }
+
+      await InvalidateUserTokens(user, normalizedClientType);
       return true;
    }
 
@@ -150,15 +179,17 @@ public class JwtManager : IJwtManager
          return false;
       }
 
-      var user = _userRepository.Get(q => q.Id == userId);
-      if (!HasUsableRefreshToken(user))
+      var tokenClientType = NormalizeClientType(result.ClaimsIdentity.FindFirst("client_type")?.Value ?? "web");
+
+      var cacheKey = GenerateCacheKey(userId, tokenClientType);
+      var cacheModel = await _cacheManager.GetRefreshTokenCache(cacheKey);
+      if (cacheModel == null || string.IsNullOrWhiteSpace(cacheModel.RefreshToken) || cacheModel.ExpireDate <= DateTime.UtcNow)
       {
          return false;
       }
 
-      var tokenClientType = NormalizeClientType(result.ClaimsIdentity.FindFirst("client_type")?.Value ?? "web");
-      return MatchesClientType(user!.RefreshToken!, tokenClientType)
-         && IsRefreshTokenBoundToAccessToken(user.RefreshToken!, token, tokenClientType);
+      return MatchesClientType(cacheModel.RefreshToken, tokenClientType)
+         && IsRefreshTokenBoundToAccessToken(cacheModel.RefreshToken, token, tokenClientType);
    }
 
    public async Task<bool> Validate(string token, string expectedClientType)
@@ -178,14 +209,15 @@ public class JwtManager : IJwtManager
          return false;
       }
 
-      var user = _userRepository.Get(q => q.Id == userId);
-      if (!HasUsableRefreshToken(user))
+      var cacheKey = GenerateCacheKey(userId, normalizedClientType);
+      var cacheModel = await _cacheManager.GetRefreshTokenCache(cacheKey);
+      if (cacheModel == null || string.IsNullOrWhiteSpace(cacheModel.RefreshToken) || cacheModel.ExpireDate <= DateTime.UtcNow)
       {
          return false;
       }
 
-      return MatchesClientType(user!.RefreshToken!, normalizedClientType)
-         && IsRefreshTokenBoundToAccessToken(user.RefreshToken!, token, normalizedClientType);
+      return MatchesClientType(cacheModel.RefreshToken, normalizedClientType)
+         && IsRefreshTokenBoundToAccessToken(cacheModel.RefreshToken, token, normalizedClientType);
    }
 
    public async Task<bool> Validate(JwtTokens jwtToken)
@@ -195,7 +227,7 @@ public class JwtManager : IJwtManager
 
    private (string token, DateTime validTo) GenerateAccessToken(TokenUser tokenUser, string clientType)
    {
-      var expires = DateTime.UtcNow.AddHours(1);
+      var expires = DateTime.UtcNow.AddMinutes(60);
       var normalizedClientType = NormalizeClientType(clientType);
       var tokenDescriptor = new SecurityTokenDescriptor
       {
@@ -256,8 +288,11 @@ public class JwtManager : IJwtManager
          && user.RefreshTokenExpireDate.Value > DateTime.UtcNow;
    }
 
-   private async Task InvalidateUserTokens(User user)
+   private async Task InvalidateUserTokens(User user, string clientType)
    {
+      var cacheKey = GenerateCacheKey(user.Id, clientType);
+      _cacheManager.DeleteRefreshToken(cacheKey);
+
       user.RefreshToken = null;
       user.RefreshTokenExpireDate = null;
       await _userRepository.UpdateBulkAsync([user], null);
@@ -294,5 +329,10 @@ public class JwtManager : IJwtManager
       var accessTokenHash = ComputeAccessTokenHash(accessToken);
       return refreshToken.StartsWith($"{expectedClientType}.{accessTokenHash}.", StringComparison.Ordinal);
    }
+
+
+   private static string GenerateCacheKey(string userId, string clientType) => string.Format(ApplicationContants.REFRESHTOKEN_CACHEKEY, userId, clientType);
+
+   private static string GenerateCacheKey(Guid userId, string clientType) => GenerateCacheKey(userId.ToString(), clientType);
 
 }
