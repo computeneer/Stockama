@@ -61,8 +61,8 @@ public sealed class TenantProvisionManager : ITenantProvisionManager
          throw new HttpConfictExeptions("Company name already exists.");
       }
 
-      var adminUsername = await GenerateUniqueTenantAdminUsernameAsync(normalizedCompanyCode);
-      var adminEmail = GenerateTenantAdminEmail(request.AdminEmail, normalizedCompanyCode);
+      var adminUsername = request.AdminUsername;
+      var adminEmail = request.AdminEmail;
       var oneTimePassword = StringHelper.GenerateNumericCode(ApplicationContants.OTP_CODE_LENGTH);
       var (passwordHash, passwordSalt) = _passwordHasher.HashPassword(oneTimePassword);
 
@@ -79,7 +79,7 @@ public sealed class TenantProvisionManager : ITenantProvisionManager
 
       var tenantAdminUser = new User
       {
-         FirstName = string.IsNullOrWhiteSpace(request.AdminFirstName) ? "Tenant" : request.AdminFirstName.Trim(),
+         FirstName = string.IsNullOrWhiteSpace(request.AdminFirstName) ? "Company" : request.AdminFirstName.Trim(),
          LastName = string.IsNullOrWhiteSpace(request.AdminLastName) ? "Admin" : request.AdminLastName.Trim(),
          Username = adminUsername,
          Email = adminEmail,
@@ -136,31 +136,6 @@ public sealed class TenantProvisionManager : ITenantProvisionManager
             tenantAdminUser.Username,
             tenantAdminUser.Email);
       }, cancellationToken);
-   }
-
-   private async Task<string> GenerateUniqueTenantAdminUsernameAsync(string companyCode)
-   {
-      var baseUsername = $"admin.{companyCode}";
-      var username = baseUsername;
-      var suffix = 1;
-
-      while (await _userRepository.AnyAsync(q => q.Username == username))
-      {
-         username = $"{baseUsername}{suffix:00}";
-         suffix++;
-      }
-
-      return username;
-   }
-
-   private static string GenerateTenantAdminEmail(string adminEmail, string companyCode)
-   {
-      if (StringHelper.IsValidEmail(adminEmail))
-      {
-         return adminEmail.Trim().ToLowerInvariant();
-      }
-
-      return $"admin+{companyCode}@stockama.local";
    }
 
    private static void ValidateRequest(TenantProvisionRequest request)
