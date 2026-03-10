@@ -47,6 +47,7 @@ static void Initialize(DataContext _context, Guid superAdminId, bool isDevelopme
 {
    Seed<Language>(_context, superAdminId);
    Seed<Company>(_context, superAdminId);
+   Seed<MessageTemplate>(_context, superAdminId);
    SeedSuperAdminUser(_context, superAdminId);
 
    if (isDevelopment)
