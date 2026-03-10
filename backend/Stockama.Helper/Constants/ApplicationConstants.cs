@@ -12,6 +12,7 @@ public class ApplicationContants
    public const string LANGUAGE_CACHEKEY = $"{CACHE_PREFIX}_languages";
    public const string COMPANY_CACHEKEY = $"{CACHE_PREFIX}_companies";
    public const string RESOURCE_CACHEKEY = $"{CACHE_PREFIX}_resource_{{0}}";
+   public const string REFRESHTOKEN_CACHEKEY = $"{CACHE_PREFIX}_refreshtoken_{{0}}_{{1}}";
 
    /**  SETTINGS **/
 
