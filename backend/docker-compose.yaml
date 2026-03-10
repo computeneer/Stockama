@@ -31,7 +31,7 @@ services:
       image: redis
       restart: always
       ports:
-         - "${STOCKAMA_REDIS_PORT:-6379}:6379"
+         - "${STOCKAMA_REDIS_SERVICE_PORT:-6379}:6379"
       networks:
          - backendnetwork
       env_file:
