@@ -115,7 +115,7 @@ public class LoginCommandHandlerTests
          PasswordHash = [1, 2],
          PasswordSalt = [3, 4],
          CompanyId = Guid.NewGuid(),
-         FirstName = "Tenant",
+         FirstName = "Admin",
          LastName = "Admin"
       };
    }

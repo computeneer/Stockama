@@ -34,7 +34,7 @@ public class ChangePasswordCommandHandlerTests
          PasswordSalt = [8],
          MustChangePassword = true,
          OneTimePasswordUsed = true,
-         FirstName = "Tenant",
+         FirstName = "Admin",
          LastName = "Admin"
       };
 
@@ -81,7 +81,7 @@ public class ChangePasswordCommandHandlerTests
          Email = "tenant@stockama.local",
          PasswordHash = [9],
          PasswordSalt = [8],
-         FirstName = "Tenant",
+         FirstName = "Admin",
          LastName = "Admin"
       };
 

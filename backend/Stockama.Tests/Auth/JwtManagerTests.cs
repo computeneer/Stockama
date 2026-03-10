@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using Stockama.Core.Authorization;
 using Stockama.Core.Authorization.Models;
+using Stockama.Core.Cache;
 using Stockama.Core.Data;
 using Stockama.Core.Exeptions;
 using Stockama.Data.Domain;
@@ -14,12 +15,14 @@ public class JwtManagerTests
 {
    private readonly Mock<IRepository<User>> _repositoryMock;
    private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock;
+   private readonly Mock<ICacheManager> _cacheManager;
 
    public JwtManagerTests()
    {
       EnvironmentVariables.JwtTokenKey = "this-is-a-long-enough-jwt-test-key-123456";
       _repositoryMock = new Mock<IRepository<User>>();
       _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+      _cacheManager = new Mock<ICacheManager>();
    }
 
    [Fact]
@@ -138,7 +141,7 @@ public class JwtManagerTests
 
    private JwtManager CreateSut()
    {
-      return new JwtManager(_httpContextAccessorMock.Object, _repositoryMock.Object);
+      return new JwtManager(_httpContextAccessorMock.Object, _repositoryMock.Object, _cacheManager.Object);
    }
 
    private void SetupUserPersistence(User user)

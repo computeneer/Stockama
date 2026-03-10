@@ -8,6 +8,7 @@ public interface ICacheUnit
    Task<Dictionary<string, T>> GetByPatternAsync<T>(string pattern);
    void Set<T>(string key, T value);
    Task SetAsync<T>(string key, T value);
+   Task SetAsync<T>(string key, T value, TimeSpan? expiry);
    bool IsSet(string key);
    Task<bool> IsSetAsync(string key);
    void Remove(string key);

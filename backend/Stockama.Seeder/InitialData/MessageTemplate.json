@@ -1,0 +1,11 @@
+[
+	{
+		"Id": "bd0c96c6-1ed8-42e1-9c7e-eaf64cf4fb42",
+		"TemplateKey": "tenant_admin_one_time_password",
+		"Subject": "Your one-time password for Stockama",
+		"Body": "Hello {{FirstName}} {{Username}} {{LastName}},\n\nYour {{CompanyName}} one-time password for Stockama is: {{OneTimePassword}}\n\nThis password will expire in 15 minutes.\n\nBest regards,\nThe Stockama Team",
+		"CreatedAt": "2024-06-01T12:00:00Z",
+		"UpdatedAt": "2024-06-01T12:00:00Z",
+		"LanguageId": "1523e41d-b40b-4cde-b8ff-94bdb95d36d5"
+	}
+]

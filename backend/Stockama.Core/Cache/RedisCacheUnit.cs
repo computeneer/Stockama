@@ -206,4 +206,12 @@ public sealed class RedisCacheUnit : ICacheUnit
    {
       await _redis.StringSetAsync(key, Encoding.UTF8.GetBytes(JsonSerializer.Serialize<T>(value)));
    }
+
+   public async Task SetAsync<T>(string key, T value, TimeSpan? expiry)
+   {
+      if (value == null)
+         return;
+
+      await _redis.StringSetAsync(key, Encoding.UTF8.GetBytes(JsonSerializer.Serialize<T>(value)), expiry, When.Always);
+   }
 }

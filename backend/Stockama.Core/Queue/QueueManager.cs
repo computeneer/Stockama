@@ -9,47 +9,42 @@ namespace Stockama.Core.Queue;
 
 public sealed class QueueManager : IQueueManager
 {
-   private readonly IBackgroundTaskManager _backgroundTaskManager;
    private readonly IMessageTemplateManager _messageTemplateManager;
    private readonly IQueueTransportManager _queueTransportManager;
    private readonly ILogger<QueueManager> _logger;
 
    public QueueManager(
-      IBackgroundTaskManager backgroundTaskManager,
       IMessageTemplateManager messageTemplateManager,
       IQueueTransportManager queueTransportManager,
       ILogger<QueueManager> logger)
    {
-      _backgroundTaskManager = backgroundTaskManager;
       _messageTemplateManager = messageTemplateManager;
       _queueTransportManager = queueTransportManager;
       _logger = logger;
    }
 
-   public Task EnqueueTemplateMessageAsync(QueueTemplateMessageRequest request, CancellationToken cancellationToken = default)
+   public async Task EnqueueTemplateMessageAsync(QueueTemplateMessageRequest request, CancellationToken cancellationToken = default)
    {
       ValidateRequest(request);
 
-      _backgroundTaskManager.QueueWorkItem(async token =>
-      {
-         var languageId = request.LanguageId.IsNullOrEmpty()
-            ? Guid.Parse(ApplicationContants.DefaultLanguageId)
-            : request.LanguageId;
+      var languageId = request.LanguageId.IsNullOrEmpty()
+         ? Guid.Parse(ApplicationContants.DefaultLanguageId)
+         : request.LanguageId;
 
-         var renderedTemplate = await _messageTemplateManager.RenderAsync(request.TemplateKey, languageId, request.TemplateValues, token);
-         var payload = JsonSerializer.Serialize(new OutboundQueueMessage(
-            request.Recipient,
-            renderedTemplate.Subject,
-            renderedTemplate.Body,
-            request.TemplateKey,
-            DateTimeOffset.UtcNow));
+      var renderedTemplate = await _messageTemplateManager.RenderAsync(request.TemplateKey, languageId, request.TemplateValues, cancellationToken);
+      var payload = JsonSerializer.Serialize(new OutboundQueueMessage(
+         request.Recipient,
+         renderedTemplate.Subject,
+         renderedTemplate.Body,
+         request.TemplateKey,
+         DateTimeOffset.UtcNow));
 
-         await _queueTransportManager.PublishAsync(request.QueueName, payload, token);
-      });
+      await _queueTransportManager.PublishAsync(request.QueueName, payload, cancellationToken);
+
 
       _logger.LogInformation("Queue message scheduled. Queue: {QueueName}, Template: {TemplateKey}", request.QueueName, request.TemplateKey);
 
-      return Task.CompletedTask;
+      return;
    }
 
    private static void ValidateRequest(QueueTemplateMessageRequest request)

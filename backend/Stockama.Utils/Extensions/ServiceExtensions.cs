@@ -123,17 +123,8 @@ public static class ServiceExtensions
       services.AddScoped<IMessageTemplateManager, MessageTemplateManager>();
       services.AddScoped<IQueueManager, QueueManager>();
 
-      services.AddSingleton<IBackgroundTaskManager, BackgroundTaskManager>();
-      services.AddHostedService<QueueBackgroundService>();
+      services.AddSingleton<IQueueTransportManager, RabbitMqQueueTransportManager>();
 
-      if (EnvironmentVariables.QueueProvider.Equals("rabbitmq", StringComparison.OrdinalIgnoreCase))
-      {
-         services.AddSingleton<IQueueTransportManager, RabbitMqQueueTransportManager>();
-      }
-      else
-      {
-         services.AddSingleton<IQueueTransportManager, DevelopmentQueueTransportManager>();
-      }
 
       return services;
    }

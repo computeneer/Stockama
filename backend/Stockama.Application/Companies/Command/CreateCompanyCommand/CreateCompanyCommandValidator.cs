@@ -21,6 +21,10 @@ public sealed class CreateCompanyCommandValidator : AbstractValidator<CreateComp
          .MaximumLength(15)
          .Matches("^[a-zA-Z0-9._-]+$");
 
+      RuleFor(q => q.AdminUsername)
+         .NotEmpty()
+         .MaximumLength(31);
+
       RuleFor(q => q.AdminFirstName)
          .NotEmpty()
          .MaximumLength(63);
